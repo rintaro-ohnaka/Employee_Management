@@ -36,3 +36,45 @@ CREATE TABLE department_table(
     department_update_date VARCHAR(255),
     PRIMARY KEY (department_id)
 )
+
+
+-- 社員情報データを入れてみる
+INSERT INTO employee_table(
+    employee_name,
+    employee_age,
+    employee_gender,
+    employee_postal_code,
+    employee_prefecture,
+    employee_address,
+    employee_start_date,
+    employee_leave_date
+) VALUES (
+    '{employee_name}',
+    '{employee_age}',
+    '{employee_gender}',
+    '{employee_postal_code}',
+    '{employee_prefecture}',
+    '{employee_address}',
+    '{employee_start_date}',
+    '{employee_leave_date}'
+)
+
+-- 写真データを入れてみる
+INSERT INTO employee_image_table(
+    employee_image,
+    employee_image_update_date
+) VALUES (
+    '{employee_image}',
+    'LOCALTIME()'
+)
+
+-- 部署データを入れてみる
+INSERT INTO department_table(
+    department_name,
+    department_create_date,
+    department_update_date
+) VALUES (
+    '{department_name}',
+    'LOCALTIME()',
+    'LOCALTIME()'
+)

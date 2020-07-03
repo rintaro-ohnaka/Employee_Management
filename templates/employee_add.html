@@ -2,55 +2,73 @@
 <html lang="ja">
 <head>
 <title>社員情報追加・編集</title>
+<style type="text/css">
+    li{
+        color: red;
+    }
+</style>
 </head>
 <body>
 <h1>社員情報追加・編集ページ</h1>
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <ul class=flashes>
+    {% for category, message in messages %}
+      <li class="{{ category }}">{{ message }}</li>
+    {% endfor %}
+    </ul>
+  {% endif %}
+{% endwith %}
 <h1>社員データを修正します</h1>
 
-<form method="post">
+<form method="post" enctype="multipart/form-data" action="/add">
     <p><label for="">社員ID：</label>
-    <input type="text"></p>
+    <input type="text" name="employee_id"></p>
 
     <p><label for="">名前：</label>
-    <input type="text"></p>
+    <input type="text" name="employee_name"></p>
 
     <p><label for="">年齢：</label>
-    <input type="text"></p>
+    <input type="text" name="employee_age"></p>
 
-    <p>性別：<input type="radio" name="" id="">男性
-    <input type="radio" name="" id="">女性</p>
+    <p>性別：<input type="radio" name="gender" value="man">男性
+    <input type="radio" name="gender" value="woman">女性</p>
 
     <p><label for="">写真：</label>
-    <input type="file" name="" id=""></p>
+    <input type="file" name="employee_image" id=""></p>
 
     <p><label for="">郵便番号：</label>
-    <input type="text"></p>
+    <input type="text" name="employee_postal_code"></p>
 
-    <p>都道府県：<select name="" id="">
-        <option value="">東京都</option>
-        <option value="">神奈川県</option>
-        <option value="">埼玉県</option>
-        <option value="">千葉県</option>
+    <p>都道府県：<select name="employee_prefecture" id="">
+        <option value="東京都">東京都</option>
+        <option value="神奈川県">神奈川県</option>
+        <option value="埼玉県">埼玉県</option>
+        <option value="千葉県">千葉県</option>
     </select></p>
 
     <p><label for="">住所：</label>
-    <input type="text"></p>
+    <input type="text" name="employee_address"></p>
 
-    <p>所属：<select name="" id="">
-        <option value="">総務部</option>
-        <option value="">人事部</option>
-        <option value="">営業部</option>
-        <option value="">広報部</option>
+    <p>所属：<select name="department_name" id="">
+        <option value="総務部">総務部</option>
+        <option value="人事部">人事部</option>
+        <option value="営業部">営業部</option>
+        <option value="広報部">広報部</option>
+        <option value="情報システム">情報システム部</option>
     </select></p>
 
     <p><label for="">入社日：</label>
-    <input type="text"></p>
+    <input type="text" name="employee_start_date"></p>
 
     <p><label for="">退社日：</label>
-    <input type="text"></p>
+    <input type="text" name="employee_leave_date"></p>
 
     <button type="submit">設定する</button>
     <button type="submit">キャンセルする</button>
+</form>
+<form method="post" action="/">
+    <p><button type="submit">社員情報一覧に戻る</button></p>
 </form>
 
 </body>
