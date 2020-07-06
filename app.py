@@ -161,13 +161,42 @@ def add_query_department_table(department_id, department_name):
     return query_department
 
 
-# 社員の編集
-@app.route("edit_employee", methods=["GET", "POST"])
-    cursor, cnx = get_connection
-    employee_name = request.form.get("employee_name", "")
-    get_query_update_employee = f"UPDATE "
-    cursor.execute(get_query_update_employee)
-    cnx.commit()
+
+
+
+
+# 社員情報の編集
+@app.route("/edit_employee", methods=["GET", "POST"])
+def edit_employee():
+    cursor, cnx = get_connection()
+    employee_id = request.form.get("employee_id", "")
+    # 部署一覧を取得している
+    department = get_department_query()
+    # 選択した社員の全てのステータスをここで取得
+    get_query_employee_information = f"SELECT * FROM employee_table WHERE employee_id = '{employee_id}' "
+    cursor.execute(get_query_employee_information)
+
+    employees = []
+    for (id, employee_id, employee_name, employee_age, employee_gender, employee_image_id, employee_postal_code, employee_prefecture, employee_address, department_id, employee_start_date, employee_leave_date, employee_update_date) in cursor:
+        item = { "id":id, "employee_id":employee_id, "employee_name":employee_name, "employee_age":employee_age, "employee_gender":employee_gender, "employee_image_id":employee_image_id, "employee_postal_code":employee_postal_code, "employee_prefecture":employee_prefecture, "employee_address":employee_address, "department_id":department_id, "employee_start_date":employee_start_date, "employee_leave_date":employee_leave_date, "employee_update_date":employee_update_date}
+        employees.append(item)
+    
+    
+    params = {
+    "employees" : employees,
+    "department" : department
+    }
+
+    return render_template("employee_add.html", **params)
+
+    # get_query_update_employee = f"UPDATE "
+    # cursor.execute(get_query_update_employee)
+    # cnx.commit()
+
+
+
+
+
 
 
 

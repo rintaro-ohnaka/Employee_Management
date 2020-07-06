@@ -31,7 +31,12 @@
     <tr>
         <td>{{ item.employee_id }}</td>
         <td>{{ item.employee_name }}</td>
-        <td>ここに編集</td>
+        <td>
+            <form method="post" action="/edit_employee">
+                <input type="hidden" name="employee_id" value="{{item.employee_id}}">
+                <button type="submit">編集</button>
+            </form>
+        </td>
         <td>ここに削除</td>
     </tr>
     {% endfor %}
