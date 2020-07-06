@@ -83,3 +83,8 @@ SELECT employee_id, employee_name
 FROM employee_table
 JOIN employee_image_table
 ON employee_table.employee_image_id = employee_image_table.employee_image_id
+
+-- 部署名変更をの文を書いてみる
+UPDATE department_table 
+SET department_id = "", department_name = "" 
+WHERE department_name = ""

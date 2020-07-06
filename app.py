@@ -45,30 +45,30 @@ def get_employee_query():
 @app.route("/", methods=['GET', 'POST'])
 def employee_list():
     employees = get_employee_query()
+    
     params = {
-    "employees" : employees
+    "employees" : employees,
     }
     return render_template("employee_list.html", **params)
 
 
 # ランダムな文字列を生成する
 import random, string
-def randomname(n):
-   randlst = [random.choice(string.ascii_letters + string.digits) for i in range(n)]
-   return ''.join(randlst)
+# def randomname(n):
+#    randlst = [random.choice(string.ascii_letters + string.digits) for i in range(n)]
+#    return ''.join(randlst)
 
 def create_employee_image_id():
     employee_image_id = [random.choice(string.ascii_letters + string.digits) for i in range(10)]
     return ''.join(employee_image_id)
 
 def create_department_id():
-   department_id = [random.choice(string.ascii_letters + string.digits) for i in range(10)]
-   return ''.join(department_id)
+    department_id = [random.choice(string.ascii_letters + string.digits) for i in range(10)]
+    return ''.join(department_id)
 
 
 # 先に従業員追加の処理を実装して、そこでデータをinsertで入力する
 # 従業員の新規追加ボタンの実装
-
 @app.route("/add", methods=["GET", "POST"])
 def employee_add():
     # ここではformで送信された値を受け取っている
@@ -94,13 +94,15 @@ def employee_add():
         # }
     else:
         flash("ようこそ、社員情報追加のページへ", "")
+        # ここで部署のリストを渡している
+        department = get_department_query()
+        params = {
+        "department" : department
+        }
     # return render_template("employee_add.html", **params)
-    return render_template("employee_add.html")
+    return render_template("employee_add.html", **params)
 
-# 受け取った値、変数をまとめて配列にする
-# def get_employee_information():
-#     employee_information = []
-#     return
+
 
 # 画像を保存する関数
 def save_filename(employee_image):
@@ -157,3 +159,115 @@ def add_query_employee_image_table(employee_image_id, filename):
 def add_query_department_table(department_id, department_name):
     query_department = f"INSERT INTO department_table (department_id, department_name, department_create_date, department_update_date) VALUES ('{department_id}', '{department_name}', LOCALTIME(), LOCALTIME())"
     return query_department
+
+
+# 社員の編集
+@app.route("edit_employee", methods=["GET", "POST"])
+    cursor, cnx = get_connection
+    employee_name = request.form.get("employee_name", "")
+    get_query_update_employee = f"UPDATE "
+    cursor.execute(get_query_update_employee)
+    cnx.commit()
+
+
+
+# 部署を受け取る
+def retrieve_department(cursor):
+    department = []
+    for (department_id, department_name) in cursor:
+        item = {"department_id":department_id, "department_name":department_name}
+        department.append(item)
+    return department
+
+# SQL文を取得
+def get_department_query():
+    cursor, cnx = get_connection()
+    department_list = "SELECT department_id, department_name FROM department_table"
+    cursor.execute(department_list)
+    department = retrieve_department(cursor)
+    return department
+
+# 部署の一覧を表示
+@app.route("/department", methods=["GET", "POST"])
+def department_list():
+    department = get_department_query()
+    params = {
+    "department" : department
+    }
+    return render_template("department_list.html", **params)
+
+
+# 部署の追加と編集どちらも一つの関数で表現してみる
+@app.route("/add_edit_department", methods=["GET", "POST"])
+def add_edit_department():
+    change_department_name = request.form.get("change_department_name", "")
+    department_name = request.form.get("department_name", "")
+    if department_name != "":
+        change_department(change_department_name, department_name)
+    else:
+        create_department(change_department_name)
+    # return render_template("department_list.html")
+    return redirect("/department")
+
+# 部署のリストから編集ボタンか新規追加を押した時、編集ページに飛ぶための関数
+@app.route("/connect_add_edit_department", methods=["GET", "POST"])
+def connect_add_edit_department():
+    department_name = request.form.get("department_name", "")
+    return render_template("department_add.html", department_name=department_name)
+
+
+
+# 部署名の編集
+def change_department(change_department_name, department_name):
+    cursor, cnx = get_connection()
+    # update文
+    get_query_update_department = f"UPDATE department_table SET department_name = '{change_department_name}' WHERE department_name = '{department_name}' "
+    cursor.execute(get_query_update_department)
+    cnx.commit()
+
+# 部署の新規作成
+def create_department(change_department_name):
+    cursor, cnx = get_connection()
+    department_id = create_department_id()
+    # insert文
+    get_query_create_department = f"INSERT INTO department_table (department_id, department_name) VALUES ('{department_id}', '{change_department_name}') "
+    cursor.execute(get_query_create_department)
+    cnx.commit()
+
+# 部署の削除
+@app.route("/delete_department", methods=["GET", "POST"])
+def delete_department():
+    cursor, cnx = get_connection()
+    department_name = request.form.get("department_name", "")
+    get_query_delete_department = f"DELETE FROM department_table WHERE department_name = '{department_name}' "
+    cursor.execute(get_query_delete_department)
+    cnx.commit()
+    return redirect("/department")
+
+# 部署の追加、今は編集だけど
+# @app.route("/edit_department", methods=["GET", "POST"])
+# def edit_department():
+#     change_department_name = request.form.get("change_department_name", "")
+#     department_name = request.form.get("department_name", "")
+#     change_department(change_department_name, department_name)
+#     return render_template("department_add.html")
+
+# # 部署のリストから編集ボタンを押した時、編集ページに飛ぶための関数
+# @app.route("/edit_department_link", methods=["GET", "POST"])
+# def connect_edit_department():
+#     department_name = request.form.get("department_name", "")
+#     return render_template("department_add.html", department_name=department_name)
+
+# @app.route("/add_department", methods=["GET", "POST"])
+# def add_department():
+#     change_department_name = request.form.get("change_department_name", "")
+#     # department_name = request.form.get("department_name", "")
+#     create_department(change_department_name)
+#     return render_template("department_add.html")
+
+# @app.route("add_department_link", methods=["GET", "POST"])
+# def connect_add_department():
+#     return render_template("department_add.html")
+
+
+

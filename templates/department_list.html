@@ -2,24 +2,54 @@
 <html lang="ja">
 <head>
 <title>部署情報一覧</title>
+<style type="text/css">
+    table, td, th {
+        border: solid black 1px;
+        height: 50px;
+    }
+    table {
+        width: 500px;
+    }
+    img{
+        width: 180px;
+        height: 200px;
+    }
+</style>
 </head>
 <body>
 <h1>部署情報一覧ページ</h1>
 <p>部署一覧</p>
-<tr>
-    <th>ID</th>
-    <th>部署名</th>
-    <th>編集</th>
-    <th>削除</th>
-</tr>
-<tr>
-    <td>ここにID</td>
-    <td>ここに部署名</td>
-    <td>ここに編集</td>
-    <td>ここに削除</td>
-</tr>
+<table>
+    <tr>
+        <th>ID</th>
+        <th>部署名</th>
+        <th>編集</th>
+        <th>削除</th>
+    </tr>
 
-<p><button>新規追加</button></p>
+    {% for item in department %}
+    <tr>
+        <td>{{ item.department_id }}</td>
+        <td>{{ item.department_name }}</td>
+        <td>
+            <form method="post" action="/connect_add_edit_department">
+                <input type="hidden" name="department_name" value="{{item.department_name}}">
+                <!-- <input type="submit" value="編集"> -->
+                <button type="submit">編集</button>
+            </form>
+        </td>
+        <td>
+            <form method="post" action="/delete_department">
+                <input type="hidden" name="department_name" value="{{item.department_name}}">
+                <button type="submit">削除</button>
+            </form>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+<form method="post" action="/connect_add_edit_department">
+    <p><button type="submit">新規追加</button></p>
+</form>
 
 
 </body>
