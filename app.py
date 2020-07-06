@@ -36,7 +36,7 @@ def retrieve_employees(cursor):
 # 社員情報をSQLで取得
 def get_employee_query():
     cursor, cnx = get_connection()
-    employee_list = ""
+    employee_list = "SELECT employee_id, employee_name FROM employee_table"
     cursor.execute(employee_list)
     employees = retrieve_employees(cursor)
     return employees
@@ -59,11 +59,11 @@ def randomname(n):
 
 def create_employee_image_id():
     employee_image_id = [random.choice(string.ascii_letters + string.digits) for i in range(10)]
-    return employee_image_id
+    return ''.join(employee_image_id)
 
 def create_department_id():
    department_id = [random.choice(string.ascii_letters + string.digits) for i in range(10)]
-   return department_id
+   return ''.join(department_id)
 
 
 # 先に従業員追加の処理を実装して、そこでデータをinsertで入力する
@@ -73,6 +73,7 @@ def create_department_id():
 def employee_add():
     # ここではformで送信された値を受け取っている
     if "employee_image" in request.files:
+        employee_id = request.form.get("employee_id", "")
         employee_name = request.form.get("employee_name", "")
         employee_age = request.form.get("employee_age", "")
         employee_gender = request.form.get("employee_gender", "")
@@ -87,7 +88,7 @@ def employee_add():
         employee_image_id = create_employee_image_id()
         department_id = create_department_id()
         filename = save_filename(employee_image)
-        add_employee(employee_name, employee_age, employee_gender, employee_image_id, employee_postal_code, employee_prefecture, employee_address, department_id, employee_start_date, employee_leave_date, filename, department_name)
+        add_employee(employee_id, employee_name, employee_age, employee_gender, employee_image_id, employee_postal_code, employee_prefecture, employee_address, department_id, employee_start_date, employee_leave_date, filename, department_name)
         # params = {
         # "employee_information" : employee_information
         # }
@@ -108,11 +109,11 @@ def save_filename(employee_image):
     return filename
 
 # DBに保存を実行
-def add_employee(employee_name, employee_age, employee_gender, employee_image_id, employee_postal_code, employee_prefecture, employee_address, department_id, employee_start_date, employee_leave_date, filename, department_name):
+def add_employee(employee_id, employee_name, employee_age, employee_gender, employee_image_id, employee_postal_code, employee_prefecture, employee_address, department_id, employee_start_date, employee_leave_date, filename, department_name):
     cursor, cnx = get_connection()
-    query_employee = add_query_employee_table(employee_name, employee_age, employee_gender, employee_postal_code, employee_prefecture, employee_address, employee_start_date, employee_leave_date)
-    query_employee_image = add_query_employee_image_table(filename)
-    query_department = add_query_department_table(department_name)
+    query_employee = add_query_employee_table(employee_id, employee_name, employee_age, employee_gender, employee_image_id, employee_postal_code, employee_prefecture, employee_address, department_id, employee_start_date, employee_leave_date)
+    query_employee_image = add_query_employee_image_table(employee_image_id, filename)
+    query_department = add_query_department_table(department_id, department_name)
     cursor.execute(query_employee)
     cursor.execute(query_employee_image)
     cursor.execute(query_department)
@@ -120,8 +121,9 @@ def add_employee(employee_name, employee_age, employee_gender, employee_image_id
     # return redirect("/")
 
 # tableに値を保存
-def add_query_employee_table(employee_name, employee_age, employee_gender, employee_image_id, employee_postal_code, employee_prefecture, employee_address, department_id, employee_start_date, employee_leave_date):
+def add_query_employee_table(employee_id, employee_name, employee_age, employee_gender, employee_image_id, employee_postal_code, employee_prefecture, employee_address, department_id, employee_start_date, employee_leave_date):
     query_employee = f"INSERT INTO employee_table (\
+    employee_id,\
     employee_name,\
     employee_age,\
     employee_gender,\
@@ -133,6 +135,7 @@ def add_query_employee_table(employee_name, employee_age, employee_gender, emplo
     employee_start_date,\
     employee_leave_date\
     ) VALUES (\
+    '{employee_id}',\
     '{employee_name}',\
     '{employee_age}',\
     '{employee_gender}',\
@@ -146,11 +149,11 @@ def add_query_employee_table(employee_name, employee_age, employee_gender, emplo
     )"
     return query_employee
 
-def add_query_employee_image_table(filename):
+def add_query_employee_image_table(employee_image_id, filename):
     sql_img = "./static/" + filename
-    query_employee_image = f"INSERT INTO employee_image_table (employee_image, employee_image_update_date) VALUES ('{sql_img}', LOCALTIME())"
+    query_employee_image = f"INSERT INTO employee_image_table (employee_image_id, employee_image, employee_image_update_date) VALUES ('{employee_image_id}', '{sql_img}', LOCALTIME())"
     return query_employee_image
 
-def add_query_department_table(department_name):
-    query_department = f"INSERT INTO department_table (department_name, department_create_date, department_update_date) VALUES ('{department_name}', LOCALTIME(), LOCALTIME())"
+def add_query_department_table(department_id, department_name):
+    query_department = f"INSERT INTO department_table (department_id, department_name, department_create_date, department_update_date) VALUES ('{department_id}', '{department_name}', LOCALTIME(), LOCALTIME())"
     return query_department

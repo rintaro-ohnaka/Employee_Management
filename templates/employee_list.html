@@ -2,25 +2,40 @@
 <html lang="ja">
 <head>
 <title>社員情報一覧</title>
+<style type="text/css">
+    table, td, th {
+        border: solid black 1px;
+        height: 50px;
+    }
+    table {
+        width: 500px;
+    }
+    img{
+        width: 180px;
+        height: 200px;
+    }
+</style>
 </head>
 <body>
 <h1>社員情報一覧ページ</h1>
 <p>社員一覧</p>
-<tr>
-    <th>社員ID</th>
-    <th>名前</th>
-    <th>編集</th>
-    <th>削除</th>
-</tr>
+<table>
+    <tr>
+        <th>社員ID</th>
+        <th>名前</th>
+        <th>編集</th>
+        <th>削除</th>
+    </tr>
 
-{% for item in employees %}
-<tr>
-    <td>{{ item.employee_id }}</td>
-    <td>{{ item.employee_name }}</td>
-    <td>ここに編集</td>
-    <td>ここに削除</td>
-</tr>
-{% endfor %}
+    {% for item in employees %}
+    <tr>
+        <td>{{ item.employee_id }}</td>
+        <td>{{ item.employee_name }}</td>
+        <td>ここに編集</td>
+        <td>ここに削除</td>
+    </tr>
+    {% endfor %}
+</table>
 
 <form method="post" action="/add">
     <p><button type="submit">新規追加</button></p>
