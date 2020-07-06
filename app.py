@@ -51,6 +51,21 @@ def employee_list():
     return render_template("employee_list.html", **params)
 
 
+# ランダムな文字列を生成する
+import random, string
+def randomname(n):
+   randlst = [random.choice(string.ascii_letters + string.digits) for i in range(n)]
+   return ''.join(randlst)
+
+def create_employee_image_id():
+    employee_image_id = [random.choice(string.ascii_letters + string.digits) for i in range(10)]
+    return employee_image_id
+
+def create_department_id():
+   department_id = [random.choice(string.ascii_letters + string.digits) for i in range(10)]
+   return department_id
+
+
 # 先に従業員追加の処理を実装して、そこでデータをinsertで入力する
 # 従業員の新規追加ボタンの実装
 
@@ -68,8 +83,11 @@ def employee_add():
         department_name = request.form.get("department_name", "")
         employee_start_date = request.form.get("employee_start_date", "")
         employee_leave_date = request.form.get("employee_leave_date", "")
+        # このIDにはランダムな文字列を生成して代入する、生成ロジックは別関数で作成する
+        employee_image_id = create_employee_image_id()
+        department_id = create_department_id()
         filename = save_filename(employee_image)
-        add_employee(employee_name, employee_age, employee_gender, employee_postal_code, employee_prefecture, employee_address, employee_start_date, employee_leave_date, filename, department_name)
+        add_employee(employee_name, employee_age, employee_gender, employee_image_id, employee_postal_code, employee_prefecture, employee_address, department_id, employee_start_date, employee_leave_date, filename, department_name)
         # params = {
         # "employee_information" : employee_information
         # }
@@ -90,7 +108,7 @@ def save_filename(employee_image):
     return filename
 
 # DBに保存を実行
-def add_employee(employee_name, employee_age, employee_gender, employee_postal_code, employee_prefecture, employee_address, employee_start_date, employee_leave_date, filename, department_name):
+def add_employee(employee_name, employee_age, employee_gender, employee_image_id, employee_postal_code, employee_prefecture, employee_address, department_id, employee_start_date, employee_leave_date, filename, department_name):
     cursor, cnx = get_connection()
     query_employee = add_query_employee_table(employee_name, employee_age, employee_gender, employee_postal_code, employee_prefecture, employee_address, employee_start_date, employee_leave_date)
     query_employee_image = add_query_employee_image_table(filename)
@@ -102,23 +120,27 @@ def add_employee(employee_name, employee_age, employee_gender, employee_postal_c
     # return redirect("/")
 
 # tableに値を保存
-def add_query_employee_table(employee_name, employee_age, employee_gender, employee_postal_code, employee_prefecture, employee_address, employee_start_date, employee_leave_date):
+def add_query_employee_table(employee_name, employee_age, employee_gender, employee_image_id, employee_postal_code, employee_prefecture, employee_address, department_id, employee_start_date, employee_leave_date):
     query_employee = f"INSERT INTO employee_table (\
     employee_name,\
     employee_age,\
     employee_gender,\
+    employee_image_id,\
     employee_postal_code,\
     employee_prefecture,\
     employee_address,\
+    department_id,\
     employee_start_date,\
     employee_leave_date\
     ) VALUES (\
     '{employee_name}',\
     '{employee_age}',\
     '{employee_gender}',\
+    '{employee_image_id}',\
     '{employee_postal_code}',\
     '{employee_prefecture}',\
     '{employee_address}',\
+    '{department_id}',\
     '{employee_start_date}',\
     '{employee_leave_date}'\
     )"
