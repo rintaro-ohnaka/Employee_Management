@@ -275,7 +275,7 @@ def delete_department():
 
 
 
-
+# 社員情報一覧から検索画面にページを遷移
 @app.route("/search", methods=["GET", "POST"])
 def link_search_employee():
     department = get_department_query()
@@ -303,7 +303,8 @@ def get_query_variable(department_name, search_employee_id, search_employee_name
     get_query_search_employee_table = "SELECT employee_id, employee_name, department_name FROM employee_table JOIN department_table ON employee_table.department_id = department_table.department_id WHERE "
     query_department_name = f"department_name = '{department_name}'"
     query_employee_id = f"employee_id = '{search_employee_id}'"
-    query_employee_name = f"employee_name = '{search_employee_name}'"
+    query_employee_name = f"employee_name LIKE '%{search_employee_name}%'"
+    # query_employee_name = f"employee_name = '{search_employee_name}'"
     sql_and = " AND "
     return sql_and, get_query_search_employee_table, query_department_name, query_employee_id, query_employee_name
 
