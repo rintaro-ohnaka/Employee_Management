@@ -285,7 +285,7 @@ def link_search_employee():
     return render_template("employee_search.html", **params)
 
 # 社員情報の検索
-@app.route("/search_employee", methods=["GET", "POST"])
+# @app.route("/search_employee", methods=["GET", "POST"])
 def employee_search():
     cursor, cnx = get_connection()
     department_name = request.form.get("department_name", "")
@@ -326,6 +326,52 @@ def find_employee(sql_and, get_query_search_employee_table, query_department_nam
         get_query_search_employee = get_query_search_employee_table + query_department_name + sql_and + query_employee_id + sql_and + query_employee_name
     
     return get_query_search_employee
+
+# 条件分岐をちょっと変えてみる
+def find_employee():
+    cursor, cnx = get_connection()
+    department_name = request.form.get("department_name", "")
+    search_employee_id = request.form.get("search_employee_id", "")
+    search_employee_name = request.form.get("search_employee_name", "")
+
+    get_query_search_employee_table = "SELECT employee_id, employee_name, department_name FROM employee_table JOIN department_table ON employee_table.department_id = department_table.department_id WHERE employee_id IS NOT NULL "
+    
+    if department_name != "":
+        get_query_search_employee_table += f"AND department_name = '{department_name}'"
+    if search_employee_id != "":
+        get_query_search_employee_table += f"AND employee_id = '{search_employee_id}'"
+    if search_employee_name != "":
+        get_query_search_employee_table += f"AND employee_name LIKE '%{search_employee_name}%'"
+    return get_query_search_employee_table
+
+    cursor.execute(get_query_search_employee_table)
+
+# 社員情報検索
+@app.route("/search_employee", methods=["GET", "POST"])
+def employee_search():
+    cursor, cnx = get_connection()
+    department_name = request.form.get("department_name", "")
+    search_employee_id = request.form.get("search_employee_id", "")
+    search_employee_name = request.form.get("search_employee_name", "")
+
+    get_query_search_employee_table = "SELECT employee_id, employee_name, department_name FROM employee_table JOIN department_table ON employee_table.department_id = department_table.department_id WHERE employee_id IS NOT NULL"
+    
+    if department_name != "":
+        get_query_search_employee_table += f" AND department_name = '{department_name}'"
+    if search_employee_id != "":
+        get_query_search_employee_table += f" AND employee_id = '{search_employee_id}'"
+    if search_employee_name != "":
+        get_query_search_employee_table += f" AND employee_name LIKE '%{search_employee_name}%'"
+
+    cursor.execute(get_query_search_employee_table)
+    search_employees = retrieve_serarch_employees(cursor)
+    return render_template("search_result.html", search_employees=search_employees)
+
+
+
+
+
+
 
 
 # 検索した従業員データを取得し、配列に代入する
