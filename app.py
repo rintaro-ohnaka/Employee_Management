@@ -273,6 +273,72 @@ def delete_department():
     cnx.commit()
     return redirect("/department")
 
+
+
+
+@app.route("/search", methods=["GET", "POST"])
+def link_search_employee():
+    department = get_department_query()
+    params = {
+    "department" : department
+    }
+    return render_template("employee_search.html", **params)
+
+# 社員情報の検索
+@app.route("/search_employee", methods=["GET", "POST"])
+def employee_search():
+    cursor, cnx = get_connection()
+    department_name = request.form.get("department_name", "")
+    search_employee_id = request.form.get("search_employee_id", "")
+    search_employee_name = request.form.get("search_employee_name", "")
+    sql_and, get_query_search_employee_table, query_department_name, query_employee_id, query_employee_name = get_query_variable(department_name, search_employee_id, search_employee_name)
+    get_query_search_employee = find_employee(sql_and, get_query_search_employee_table, query_department_name, query_employee_id, query_employee_name, department_name, search_employee_id, search_employee_name)
+    cursor.execute(get_query_search_employee)
+    search_employees = retrieve_serarch_employees(cursor)
+    return render_template("search_result.html", search_employees=search_employees)
+
+
+# 検索するSQLを受け取り
+def get_query_variable(department_name, search_employee_id, search_employee_name):
+    get_query_search_employee_table = "SELECT employee_id, employee_name, department_name FROM employee_table JOIN department_table ON employee_table.department_id = department_table.department_id WHERE "
+    query_department_name = f"department_name = '{department_name}'"
+    query_employee_id = f"employee_id = '{search_employee_id}'"
+    query_employee_name = f"employee_name = '{search_employee_name}'"
+    sql_and = " AND "
+    return sql_and, get_query_search_employee_table, query_department_name, query_employee_id, query_employee_name
+
+# 検索をする従業員を条件分岐で分ける
+def find_employee(sql_and, get_query_search_employee_table, query_department_name, query_employee_id, query_employee_name, department_name, search_employee_id, search_employee_name):
+    if department_name != "" and search_employee_id == "" and search_employee_name == "":
+        get_query_search_employee = get_query_search_employee_table + query_department_name
+    elif department_name == "" and search_employee_id != "" and search_employee_name == "":
+        get_query_search_employee = get_query_search_employee_table + query_employee_id
+    elif department_name == "" and search_employee_id != "" and search_employee_name == "":
+        get_query_search_employee = get_query_search_employee_table + query_employee_name
+    elif department_name != "" and search_employee_id != "" and search_employee_name == "":
+        get_query_search_employee = get_query_search_employee_table + query_department_name + sql_and + query_employee_id
+    elif department_name == "" and search_employee_id != "" and search_employee_name != "":
+        get_query_search_employee = get_query_search_employee_table + query_employee_id + sql_and + query_employee_name
+    elif department_name != "" and search_employee_id == "" and search_employee_name != "":
+        get_query_search_employee = get_query_search_employee_table + query_department_name + sql_and + query_employee_name
+    else:
+        get_query_search_employee = get_query_search_employee_table + query_department_name + sql_and + query_employee_id + sql_and + query_employee_name
+    
+    return get_query_search_employee
+
+
+# 検索した従業員データを取得し、配列に代入する
+def retrieve_serarch_employees(cursor):
+    search_employees = []
+    for (employee_id, employee_name, department_name) in cursor:
+        item = {"employee_id":employee_id, "employee_name":employee_name, "department_name":department_name}
+        search_employees.append(item)
+    return search_employees
+
+
+
+
+
 # 部署の追加、今は編集だけど
 # @app.route("/edit_department", methods=["GET", "POST"])
 # def edit_department():
