@@ -88,3 +88,6 @@ ON employee_table.employee_image_id = employee_image_table.employee_image_id
 UPDATE department_table 
 SET department_id = "", department_name = "" 
 WHERE department_name = ""
+
+
+SELECT * FROM employee_table INTO OUTFILE './tmp/employee_table.csv' FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"';

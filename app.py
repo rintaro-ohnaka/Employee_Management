@@ -325,7 +325,20 @@ def employee_search():
     return render_template("search_result.html", search_employees=search_employees)
 
 
+# csvファイルダウンロード
+@app.route("/download_csv")
+def download(obj):
 
+
+
+# CSVファイルに出力
+# @app.route("/csv", methods=["GET", "POST"])
+# def output_csv():
+#     cursor, cnx = get_connection()
+#     output_csvfile = "SELECT * FROM employee_table INTO OUTFILE './static/employee.csv' "
+#     # output_csvfile = "SELECT * FROM employee_table INTO OUTFILE './static/employee_table.csv' FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"'"
+#     cursor.execute(output_csvfile)
+#     return redirect('/')
 
 
 
