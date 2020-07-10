@@ -37,20 +37,28 @@
                 <button type="submit">編集</button>
             </form>
         </td>
-        <td>ここに削除</td>
+        <td>
+            <form method="post" action="/delete_employee">
+                <input type="hidden" name="employee_id" value="{{item.employee_id}}">
+                <button type="submit">削除</button>
+            </form>
+        </td>
     </tr>
     {% endfor %}
 </table>
 
-<form method="post" action="/add">
-    <p><button type="submit">新規追加</button></p>
-</form>
-<form method="post" action="/search">
-    <p><button type="submit">検索</button></p>
-</form>
-<form method="post" action="/csv">
-    <p><button type="submit" name="output_csv">CSVファイルに出力</button></p>
-</form>
+<p><form method="post" action="/add">
+    <button type="submit">新規追加</button>
+</form></p>
+<p><form method="post" action="/search">
+    <button type="submit">検索</button>
+</form></p>
+<p><form method="post" action="/department">
+    <button type="submit">部署一覧</button>
+</form></p>
+<p><form method="post" action="/download">
+    <button type="submit" name="output_csv">CSVファイルに出力</button>
+</form></p>
 
 
 </body>

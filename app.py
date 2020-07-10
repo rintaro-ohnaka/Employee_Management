@@ -72,6 +72,7 @@ def create_department_id():
 @app.route("/add", methods=["GET", "POST"])
 def employee_add():
     # ここではformで送信された値を受け取っている
+    # 新規登録を実行したあとはこちらで受け取っている
     if "employee_image" in request.files:
         employee_id = request.form.get("employee_id", "")
         employee_name = request.form.get("employee_name", "")
@@ -82,23 +83,39 @@ def employee_add():
         employee_prefecture = request.form.get("employee_prefecture", "")
         employee_address = request.form.get("employee_address", "")
         department_name = request.form.get("department_name", "")
+        department_id = request.form.get("department_id", "")
         employee_start_date = request.form.get("employee_start_date", "")
         employee_leave_date = request.form.get("employee_leave_date", "")
         # このIDにはランダムな文字列を生成して代入する、生成ロジックは別関数で作成する
         employee_image_id = create_employee_image_id()
-        department_id = create_department_id()
+        # このdepartment_idは生成せずに選択された既存のidを使用する
+        # department_id = create_department_id()
         filename = save_filename(employee_image)
         add_employee(employee_id, employee_name, employee_age, employee_gender, employee_image_id, employee_postal_code, employee_prefecture, employee_address, department_id, employee_start_date, employee_leave_date, filename, department_name)
         # params = {
         # "employee_information" : employee_information
         # }
-    else:
-        flash("ようこそ、社員情報追加のページへ", "")
-        # ここで部署のリストを渡している
-        department = get_department_query()
-        params = {
-        "department" : department
-        }
+        flash("新規追加することに成功したよ！")
+        return redirect("/")
+    # else:
+    #     flash("ようこそ、社員情報追加のページへ", "")
+    #     # ここで部署のリストを渡している
+    #     department = get_department_query()
+    #     params = {
+    #     "department" : department
+    #     }
+    # # return render_template("employee_add.html", **params)
+    # return render_template("employee_add.html", **params)
+
+    # 新規追加はこっちでやる
+    flash("ようこそ、社員情報追加のページへ", "")
+    # ここで部署のリストを渡している
+    department = get_department_query()
+    # test = ""
+    params = {
+    "department" : department
+    # "test" : test
+    }
     # return render_template("employee_add.html", **params)
     return render_template("employee_add.html", **params)
 
@@ -115,10 +132,10 @@ def add_employee(employee_id, employee_name, employee_age, employee_gender, empl
     cursor, cnx = get_connection()
     query_employee = add_query_employee_table(employee_id, employee_name, employee_age, employee_gender, employee_image_id, employee_postal_code, employee_prefecture, employee_address, department_id, employee_start_date, employee_leave_date)
     query_employee_image = add_query_employee_image_table(employee_image_id, filename)
-    query_department = add_query_department_table(department_id, department_name)
+    # query_department = add_query_department_table(department_id, department_name)
     cursor.execute(query_employee)
     cursor.execute(query_employee_image)
-    cursor.execute(query_department)
+    # cursor.execute(query_department)
     cnx.commit()
     # return redirect("/")
 
@@ -192,6 +209,19 @@ def edit_employee():
     # get_query_update_employee = f"UPDATE "
     # cursor.execute(get_query_update_employee)
     # cnx.commit()
+
+
+# 社員情報を削除
+@app.route("/delete_employee", methods=["GET", "POST"])
+def delete_employee():
+    cursor, cnx = get_connection()
+    employee_id = request.form.get("employee_id", "")
+
+    get_query_delete_employee = f"DELETE FROM employee_table WHERE employee_id = '{employee_id}' "
+    cursor.execute(get_query_delete_employee)
+    cnx.commit()
+
+    return redirect("/")
 
 
 
@@ -325,18 +355,54 @@ def employee_search():
     return render_template("search_result.html", search_employees=search_employees)
 
 
+
+
 # ここでとりあえず、csvとしてレスポンス（ブラウザでダウンロードする）ことはできた
-@app.route('/download')
+@app.route('/download', methods=["GET", "POST"])
 def download():
-    csv = """"REVIEW_DATE","AUTHOR","ISBN","DISCOUNTED_PRICE"
-"1985/01/21","Douglas Adams",0345391802,5.95
-"1990/01/12","Douglas Hofstadter",0465026567,9.95
-"1998/07/15","Timothy ""The Parser"" Campbell",0968411304,18.99
-"1999/12/03","Richard Friedman",0060630353,5.95
-"2004/10/04","Randel Helms",0879755725,4.50"""
+
+    cursor, cnx = get_connection()
+    csv_employees = get_csv_employee_query()
+    csv = ""
+    csv = csv_employees
+    # csv = csv_employees
+
+#     csv = """"REVIEW_DATE","AUTHOR","ISBN","DISCOUNTED_PRICE"
+# "1985/01/21","Douglas Adams",0345391802,5.95
+# "1990/01/12","Douglas Hofstadter",0465026567,9.95
+# "1998/07/15","Timothy ""The Parser"" Campbell",0968411304,18.99
+# "1999/12/03","Richard Friedman",0060630353,5.95
+# "2004/10/04","Randel Helms",0879755725,4.50"""
     response = make_response(csv)
-    response.headers["Content-Disposition"] = "attachment; filename=books.csv"
+    response.headers["Content-Disposition"] = "attachment; filename=employees.csv"
     return response
+
+# 従業員データを取得し、配列に代入する
+# ここに社員情報全部持ってくる、cursorのsqlを全てにする
+def csv_retrieve_employees(cursor):
+    csv_employees = ""
+    for (employee_id, employee_name) in cursor:
+        csv_employees += f"{employee_id}, {employee_name}\n"
+
+    return csv_employees
+
+# 社員情報をSQLで取得
+def get_csv_employee_query():
+    cursor, cnx = get_connection()
+    employee_list = "SELECT employee_id, employee_name FROM employee_table"
+    cursor.execute(employee_list)
+    csv_employees = csv_retrieve_employees(cursor)
+    return csv_employees
+
+# ここに社員一覧の情報を表示するロジックを書く
+# @app.route("/", methods=['GET', 'POST'])
+# def employee_list():
+#     employees = get_employee_query()
+    
+#     params = {
+#     "employees" : employees,
+#     }
+#     return render_template("employee_list.html", **params)
 
 
 
