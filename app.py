@@ -82,10 +82,17 @@ def employee_add():
         employee_postal_code = request.form.get("employee_postal_code", "")
         employee_prefecture = request.form.get("employee_prefecture", "")
         employee_address = request.form.get("employee_address", "")
-        department_name = request.form.get("department_name", "")
-        department_id = request.form.get("department_id", "")
+        department_name_id = request.form.get("department_name", "")
+        # department_name = request.form.get("department_name", "")
+        # department_id = request.form.get("department_id", "")
         employee_start_date = request.form.get("employee_start_date", "")
         employee_leave_date = request.form.get("employee_leave_date", "")
+
+        # department_nameとdepartment_idのvalueを分割してみる
+        department_array = department_name_id.split("&")
+        department_name = department_array[0]
+        department_id = department_array[1]
+
         # このIDにはランダムな文字列を生成して代入する、生成ロジックは別関数で作成する
         employee_image_id = create_employee_image_id()
         # このdepartment_idは生成せずに選択された既存のidを使用する
