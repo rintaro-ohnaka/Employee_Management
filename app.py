@@ -1,6 +1,6 @@
 # coding:utf-8
 
-from flask import Flask, flash, request, redirect, url_for, session
+from flask import Flask, flash, request, redirect, url_for, session, Response, make_response
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'employee_management'
 from flask import render_template
@@ -325,9 +325,20 @@ def employee_search():
     return render_template("search_result.html", search_employees=search_employees)
 
 
-# csvファイルダウンロード
-@app.route("/download_csv")
-def download(obj):
+# ここでとりあえず、csvとしてレスポンス（ブラウザでダウンロードする）ことはできた
+@app.route('/download')
+def download():
+    csv = """"REVIEW_DATE","AUTHOR","ISBN","DISCOUNTED_PRICE"
+"1985/01/21","Douglas Adams",0345391802,5.95
+"1990/01/12","Douglas Hofstadter",0465026567,9.95
+"1998/07/15","Timothy ""The Parser"" Campbell",0968411304,18.99
+"1999/12/03","Richard Friedman",0060630353,5.95
+"2004/10/04","Randel Helms",0879755725,4.50"""
+    response = make_response(csv)
+    response.headers["Content-Disposition"] = "attachment; filename=books.csv"
+    return response
+
+
 
 
 

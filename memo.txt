@@ -1,0 +1,20 @@
+ここに知ったことをメモしていく
+
+Writerオブジェクトに対して、writerowメソッドを使うことで、csvファイルへの一行の書き込みができます。
+
+writer.writerow(['id', 'username', 'gender', 'age', 'created_at'])
+こんな感じで、文字列にカンマを入れていく。writerowで。
+
+quotechar これは文字列をカンマで分けた後に囲うっぽい
+quotechar=‘”‘は、特別な値を含むフィールドを囲むための文字列を一文字で指定します。
+“が標準的なquotecharです。具体的に囲む際は、“囲む対象の文字“のようにして使用します。
+
+csv.QUOTE_ALL	全てのフィールドをクォートします。
+クォーティング（囲い文字）の指定をしている。
+
+1
+writer=csv.writer(f,lineterminator="\n")
+csv書き込みオブジェクト=csv.writer( ファイルオブジェクト ,lineterminator=”\n”)
+
+書き込む関数を持ったcsv書き込みオブジェクトを生成します。
+lineterminatorは改行コードの指定です。
