@@ -27,16 +27,23 @@ def get_connection():
 
 # 従業員データを取得し、配列に代入する
 def retrieve_employees(cursor):
+    # employees = []
+    # for (id, employee_id, employee_name) in cursor:
+    #     item = {"id":id, "employee_id":employee_id, "employee_name":employee_name}
+    #     employees.append(item)
+    # return employees
+
     employees = []
-    for (employee_id, employee_name) in cursor:
-        item = {"employee_id":employee_id, "employee_name":employee_name}
+    for (id, employee_id, employee_name, employee_age, employee_gender, employee_image_id, employee_postal_code, employee_prefecture, employee_address, department_id, employee_start_date, employee_leave_date, employee_update_date) in cursor:
+        item = { "id":id, "employee_id":employee_id, "employee_name":employee_name, "employee_age":employee_age, "employee_gender":employee_gender, "employee_image_id":employee_image_id, "employee_postal_code":employee_postal_code, "employee_prefecture":employee_prefecture, "employee_address":employee_address, "department_id":department_id, "employee_start_date":employee_start_date, "employee_leave_date":employee_leave_date, "employee_update_date":employee_update_date}
         employees.append(item)
     return employees
 
 # 社員情報をSQLで取得
 def get_employee_query():
     cursor, cnx = get_connection()
-    employee_list = "SELECT employee_id, employee_name FROM employee_table"
+    employee_list = "SELECT * FROM employee_table"
+    # employee_list = "SELECT id, employee_id, employee_name FROM employee_table"
     cursor.execute(employee_list)
     employees = retrieve_employees(cursor)
     return employees
@@ -189,15 +196,15 @@ def add_query_department_table(department_id, department_name):
 
 
 
-# 社員情報の編集
-@app.route("/edit_employee", methods=["GET", "POST"])
-def edit_employee():
+# 社員情報の編集画面を表示
+@app.route("/show_edit_employee", methods=["GET", "POST"])
+def show_edit_employee():
     cursor, cnx = get_connection()
-    employee_id = request.form.get("employee_id", "")
+    id = int(request.form.get("id", ""))
     # 部署一覧を取得している
     department = get_department_query()
     # 選択した社員の全てのステータスをここで取得
-    get_query_employee_information = f"SELECT * FROM employee_table WHERE employee_id = '{employee_id}' "
+    get_query_employee_information = f"SELECT * FROM employee_table WHERE id = {id} "
     cursor.execute(get_query_employee_information)
 
     employees = []
@@ -212,6 +219,53 @@ def edit_employee():
     }
 
     return render_template("employee_add.html", **params)
+
+
+# 社員情報を編集するロジックを記述
+@app.route("/edit_employee", methods=["GET", "POST"])
+def edit_employee():
+    cursor, cnx = get_connection()
+    if "employee_image" in request.files:
+        id = int(request.form.get("id", ""))
+        employee_id = request.form.get("employee_id", "")
+        employee_name = request.form.get("employee_name", "")
+        employee_age = request.form.get("employee_age", "")
+        employee_gender = request.form.get("employee_gender", "")
+        employee_image = request.files["employee_image"]
+        employee_postal_code = request.form.get("employee_postal_code", "")
+        employee_prefecture = request.form.get("employee_prefecture", "")
+        employee_address = request.form.get("employee_address", "")
+        department_name_id = request.form.get("department_name", "")
+        employee_start_date = request.form.get("employee_start_date", "")
+        employee_leave_date = request.form.get("employee_leave_date", "")
+
+        # department_nameとdepartment_idのvalueを分割してみる
+        department_array = department_name_id.split("&")
+        department_name = department_array[0]
+        department_id = department_array[1]
+
+        # このIDにはランダムな文字列を生成して代入する、生成ロジックは別関数で作成する
+        employee_image_id = create_employee_image_id()
+        filename = save_filename(employee_image)
+
+    get_query_update_employee = f"UPDATE employee_table SET \
+    employee_id = '{employee_id}', \
+    employee_name = '{employee_name}', \
+    employee_age = '{employee_age}', \
+    employee_gender = '{employee_gender}', \
+    employee_image_id = '{employee_image_id}', \
+    employee_postal_code = '{employee_postal_code}', \
+    employee_prefecture = '{employee_prefecture}', \
+    employee_address = '{employee_address}', \
+    department_id = '{department_id}', \
+    employee_start_date = '{employee_start_date}', \
+    employee_leave_date = '{employee_leave_date}' \
+    WHERE id = {id} "
+    
+    cursor.execute(get_query_update_employee)
+    cnx.commit()
+
+    return redirect('/')
 
     # get_query_update_employee = f"UPDATE "
     # cursor.execute(get_query_update_employee)
@@ -365,6 +419,7 @@ def employee_search():
 
 
 # ここでとりあえず、csvとしてレスポンス（ブラウザでダウンロードする）ことはできた
+# 全社員情報をcsv出力する
 @app.route('/download', methods=["GET", "POST"])
 def download():
 
@@ -372,31 +427,31 @@ def download():
     csv_employees = get_csv_employee_query()
     csv = ""
     csv = csv_employees
-    # csv = csv_employees
-
-#     csv = """"REVIEW_DATE","AUTHOR","ISBN","DISCOUNTED_PRICE"
-# "1985/01/21","Douglas Adams",0345391802,5.95
-# "1990/01/12","Douglas Hofstadter",0465026567,9.95
-# "1998/07/15","Timothy ""The Parser"" Campbell",0968411304,18.99
-# "1999/12/03","Richard Friedman",0060630353,5.95
-# "2004/10/04","Randel Helms",0879755725,4.50"""
     response = make_response(csv)
     response.headers["Content-Disposition"] = "attachment; filename=employees.csv"
     return response
 
-# 従業員データを取得し、配列に代入する
+
 # ここに社員情報全部持ってくる、cursorのsqlを全てにする
 def csv_retrieve_employees(cursor):
-    csv_employees = ""
-    for (employee_id, employee_name) in cursor:
-        csv_employees += f"{employee_id}, {employee_name}\n"
+    csv_employees = "id, 社員ID, 氏名, 年齢, 性別, 画像ID, 郵便番号, 都道府県, 住所, 部署ID, 入社日, 退社日, 更新日\n"
+    for (id, employee_id, employee_name, employee_age, employee_gender, employee_image_id, employee_postal_code, employee_prefecture, employee_address, department_id, employee_start_date, employee_leave_date, employee_update_date) in cursor:
+    # for (employee_id, employee_name) in cursor:
+        csv_employees += f"{id}, {employee_id}, {employee_name}, {employee_age}, {employee_gender}, {employee_image_id}, {employee_postal_code}, {employee_prefecture}, {employee_address}, {department_id}, {employee_start_date}, {employee_leave_date}, {employee_update_date}\n"
+        # csv_employees += f"{employee_id}, {employee_name}\n"
+
+    # employees = []
+    # for (id, employee_id, employee_name, employee_age, employee_gender, employee_image_id, employee_postal_code, employee_prefecture, employee_address, department_id, employee_start_date, employee_leave_date, employee_update_date) in cursor:
+    #     item = { "id":id, "employee_id":employee_id, "employee_name":employee_name, "employee_age":employee_age, "employee_gender":employee_gender, "employee_image_id":employee_image_id, "employee_postal_code":employee_postal_code, "employee_prefecture":employee_prefecture, "employee_address":employee_address, "department_id":department_id, "employee_start_date":employee_start_date, "employee_leave_date":employee_leave_date, "employee_update_date":employee_update_date}
+    #     employees.append(item)
 
     return csv_employees
 
-# 社員情報をSQLで取得
+# 全社員情報をSQLで取得
 def get_csv_employee_query():
     cursor, cnx = get_connection()
-    employee_list = "SELECT employee_id, employee_name FROM employee_table"
+    employee_list = "SELECT * FROM employee_table"
+    # employee_list = "SELECT employee_id, employee_name FROM employee_table"
     cursor.execute(employee_list)
     csv_employees = csv_retrieve_employees(cursor)
     return csv_employees

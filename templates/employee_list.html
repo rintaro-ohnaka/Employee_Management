@@ -18,6 +18,17 @@
 </head>
 <body>
 <h1>社員情報一覧ページ</h1>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <ul class=flashes>
+    {% for category, message in messages %}
+      <li class="{{ category }}">{{ message }}</li>
+    {% endfor %}
+    </ul>
+  {% endif %}
+{% endwith %}
+
 <p>社員一覧</p>
 <table>
     <tr>
@@ -32,8 +43,9 @@
         <td>{{ item.employee_id }}</td>
         <td>{{ item.employee_name }}</td>
         <td>
-            <form method="post" action="/edit_employee">
-                <input type="hidden" name="employee_id" value="{{item.employee_id}}">
+            <form method="post" action="/show_edit_employee">
+                <input type="hidden" name="id" value="{{item.id}}">
+                <!-- <input type="hidden" name="employee_id" value="{{item.employee_id}}"> -->
                 <button type="submit">編集</button>
             </form>
         </td>

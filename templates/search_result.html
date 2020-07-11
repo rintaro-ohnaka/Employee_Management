@@ -34,7 +34,7 @@
         <td>{{ item.employee_name }}</td>
         <td>{{ item.department_name }}</td>
         <td>
-            <form method="post" action="/edit_employee">
+            <form method="post" action="/show_edit_employee">
                 <input type="hidden" name="employee_id" value="{{item.employee_id}}">
                 <button type="submit">編集</button>
             </form>
