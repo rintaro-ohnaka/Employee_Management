@@ -91,7 +91,7 @@ def show_add_page():
 @app.route("/add_employee", methods=["GET", "POST"])
 def add_employee():
     employee_id, employee_name, employee_age, employee_gender, employee_image, employee_postal_code, employee_prefecture, employee_address, department_name_id, employee_start_date, employee_leave_date, department_name, department_id = request_add_employee()
-    check_add_employee(employee_id, employee_name, employee_age, employee_gender, employee_image, employee_postal_code, employee_prefecture, employee_address, employee_start_date)
+    check_add_employee(employee_id, employee_name, employee_age, employee_gender, employee_image, employee_postal_code, employee_prefecture, employee_address, department_id, employee_start_date, employee_leave_date, department_name)
     return redirect("/")
 
 
@@ -115,16 +115,16 @@ def request_add_employee():
     return employee_id, employee_name, employee_age, employee_gender, employee_image, employee_postal_code, employee_prefecture, employee_address, department_name_id, employee_start_date, employee_leave_date, department_name, department_id
 
 # formの入力に不備がないかのチェック関数
-def check_add_employee(employee_id, employee_name, employee_age, employee_gender, employee_image, employee_postal_code, employee_prefecture, employee_address, employee_start_date):
+def check_add_employee(employee_id, employee_name, employee_age, employee_gender, employee_image, employee_postal_code, employee_prefecture, employee_address, department_id, employee_start_date, employee_leave_date, department_name):
     # とりあえず、formで値が送られているかチャックするロジックを書いてみよう
     if employee_id == "" or employee_name == "" or employee_age == "" or employee_gender == "" or employee_image == "" or employee_postal_code == "" or employee_prefecture == "" or employee_address == "" or employee_start_date == "":
         flash("入力される情報に不備があったため、登録に失敗しました")
     else:
-        execute_add_employee(employee_id, employee_name, employee_age, employee_gender, employee_postal_code, employee_prefecture, employee_address, department_id, employee_start_date, employee_leave_date, department_name)
+        execute_add_employee(employee_id, employee_name, employee_age, employee_gender, employee_image, employee_postal_code, employee_prefecture, employee_address, department_id, employee_start_date, employee_leave_date, department_name)
         flash("新規追加することに成功したよ！")
 
 # 実際に社員情報を追加する関数
-def execute_add_employee(employee_id, employee_name, employee_age, employee_gender, employee_postal_code, employee_prefecture, employee_address, department_id, employee_start_date, employee_leave_date, department_name):
+def execute_add_employee(employee_id, employee_name, employee_age, employee_gender, employee_image, employee_postal_code, employee_prefecture, employee_address, department_id, employee_start_date, employee_leave_date, department_name):
     employee_image_id = create_employee_image_id()
     filename = save_filename(employee_image)
     add_employee(employee_id, employee_name, employee_age, employee_gender, employee_image_id, employee_postal_code, employee_prefecture, employee_address, department_id, employee_start_date, employee_leave_date, filename, department_name)
