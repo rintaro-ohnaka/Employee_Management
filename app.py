@@ -74,65 +74,61 @@ def create_department_id():
     return ''.join(department_id)
 
 
-# 先に従業員追加の処理を実装して、そこでデータをinsertで入力する
-# 従業員の新規追加ボタンの実装
-@app.route("/add", methods=["GET", "POST"])
-def employee_add():
-    # ここではformで送信された値を受け取っている
-    # 新規登録を実行したあとはこちらで受け取っている
-    if "employee_image" in request.files:
-        employee_id = request.form.get("employee_id", "")
-        employee_name = request.form.get("employee_name", "")
-        employee_age = request.form.get("employee_age", "")
-        employee_gender = request.form.get("employee_gender", "")
-        employee_image = request.files["employee_image"]
-        employee_postal_code = request.form.get("employee_postal_code", "")
-        employee_prefecture = request.form.get("employee_prefecture", "")
-        employee_address = request.form.get("employee_address", "")
-        department_name_id = request.form.get("department_name", "")
-        # department_name = request.form.get("department_name", "")
-        # department_id = request.form.get("department_id", "")
-        employee_start_date = request.form.get("employee_start_date", "")
-        employee_leave_date = request.form.get("employee_leave_date", "")
 
-        # department_nameとdepartment_idのvalueを分割してみる
-        department_array = department_name_id.split("&")
-        department_name = department_array[0]
-        department_id = department_array[1]
 
-        # このIDにはランダムな文字列を生成して代入する、生成ロジックは別関数で作成する
-        employee_image_id = create_employee_image_id()
-        # このdepartment_idは生成せずに選択された既存のidを使用する
-        # department_id = create_department_id()
-        filename = save_filename(employee_image)
-        add_employee(employee_id, employee_name, employee_age, employee_gender, employee_image_id, employee_postal_code, employee_prefecture, employee_address, department_id, employee_start_date, employee_leave_date, filename, department_name)
-        # params = {
-        # "employee_information" : employee_information
-        # }
-        flash("新規追加することに成功したよ！")
-        return redirect("/")
-    # else:
-    #     flash("ようこそ、社員情報追加のページへ", "")
-    #     # ここで部署のリストを渡している
-    #     department = get_department_query()
-    #     params = {
-    #     "department" : department
-    #     }
-    # # return render_template("employee_add.html", **params)
-    # return render_template("employee_add.html", **params)
-
-    # 新規追加はこっちでやる
+# 新規追加の画面を表示する関数
+@app.route("/show_add_page", methods=["GET", "POST"])
+def show_add_page():
     flash("ようこそ、社員情報追加のページへ", "")
     # ここで部署のリストを渡している
     department = get_department_query()
-    # test = ""
     params = {
     "department" : department
-    # "test" : test
     }
-    # return render_template("employee_add.html", **params)
     return render_template("employee_add.html", **params)
 
+# ここでまとめて社員情報を追加する関数を定義しておく
+@app.route("/add_employee", methods=["GET", "POST"])
+def add_employee():
+    employee_id, employee_name, employee_age, employee_gender, employee_image, employee_postal_code, employee_prefecture, employee_address, department_name_id, employee_start_date, employee_leave_date, department_name, department_id = request_add_employee()
+    check_add_employee(employee_id, employee_name, employee_age, employee_gender, employee_image, employee_postal_code, employee_prefecture, employee_address, employee_start_date)
+    return redirect("/")
+
+
+# 新規追加のリクエストを受ける関数
+# @app.route("/request_add_employee", methods=["GET", "POST"])
+def request_add_employee():
+    employee_id = request.form.get("employee_id", "")
+    employee_name = request.form.get("employee_name", "")
+    employee_age = request.form.get("employee_age", "")
+    employee_gender = request.form.get("employee_gender", "")
+    employee_image = request.files.get("employee_image", "")
+    employee_postal_code = request.form.get("employee_postal_code", "")
+    employee_prefecture = request.form.get("employee_prefecture", "")
+    employee_address = request.form.get("employee_address", "")
+    department_name_id = request.form.get("department_name", "")
+    employee_start_date = request.form.get("employee_start_date", "")
+    employee_leave_date = request.form.get("employee_leave_date", "")
+    department_array = department_name_id.split("&")
+    department_name = department_array[0]
+    department_id = department_array[1]
+    return employee_id, employee_name, employee_age, employee_gender, employee_image, employee_postal_code, employee_prefecture, employee_address, department_name_id, employee_start_date, employee_leave_date, department_name, department_id
+
+# formの入力に不備がないかのチェック関数
+def check_add_employee(employee_id, employee_name, employee_age, employee_gender, employee_image, employee_postal_code, employee_prefecture, employee_address, employee_start_date):
+    # とりあえず、formで値が送られているかチャックするロジックを書いてみよう
+    if employee_id == "" or employee_name == "" or employee_age == "" or employee_gender == "" or employee_image == "" or employee_postal_code == "" or employee_prefecture == "" or employee_address == "" or employee_start_date == "":
+        flash("入力される情報に不備があったため、登録に失敗しました")
+    else:
+        execute_add_employee(employee_id, employee_name, employee_age, employee_gender, employee_postal_code, employee_prefecture, employee_address, department_id, employee_start_date, employee_leave_date, department_name)
+        flash("新規追加することに成功したよ！")
+
+# 実際に社員情報を追加する関数
+def execute_add_employee(employee_id, employee_name, employee_age, employee_gender, employee_postal_code, employee_prefecture, employee_address, department_id, employee_start_date, employee_leave_date, department_name):
+    employee_image_id = create_employee_image_id()
+    filename = save_filename(employee_image)
+    add_employee(employee_id, employee_name, employee_age, employee_gender, employee_image_id, employee_postal_code, employee_prefecture, employee_address, department_id, employee_start_date, employee_leave_date, filename, department_name)
+    return
 
 
 # 画像を保存する関数
@@ -413,6 +409,10 @@ def employee_search():
 
     cursor.execute(get_query_search_employee_table)
     search_employees = retrieve_serarch_employees(cursor)
+    if len(search_employees) == 0:
+        flash("登録されている社員がいません", "")
+    else:
+        flash("検索結果はこちらになります", "")
     return render_template("search_result.html", search_employees=search_employees)
 
 
@@ -434,10 +434,10 @@ def download():
 
 # ここに社員情報全部持ってくる、cursorのsqlを全てにする
 def csv_retrieve_employees(cursor):
-    csv_employees = "id, 社員ID, 氏名, 年齢, 性別, 画像ID, 郵便番号, 都道府県, 住所, 部署ID, 入社日, 退社日, 更新日\n"
-    for (id, employee_id, employee_name, employee_age, employee_gender, employee_image_id, employee_postal_code, employee_prefecture, employee_address, department_id, employee_start_date, employee_leave_date, employee_update_date) in cursor:
+    csv_employees = "id, 社員ID, 氏名, 年齢, 性別, 画像ID, 郵便番号, 都道府県, 住所, 部署ID, 入社日, 退社日, 更新日, 部署名\n"
+    for (id, employee_id, employee_name, employee_age, employee_gender, employee_image_id, employee_postal_code, employee_prefecture, employee_address, department_id, employee_start_date, employee_leave_date, employee_update_date, department_name) in cursor:
     # for (employee_id, employee_name) in cursor:
-        csv_employees += f"{id}, {employee_id}, {employee_name}, {employee_age}, {employee_gender}, {employee_image_id}, {employee_postal_code}, {employee_prefecture}, {employee_address}, {department_id}, {employee_start_date}, {employee_leave_date}, {employee_update_date}\n"
+        csv_employees += f"{id}, {employee_id}, {employee_name}, {employee_age}, {employee_gender}, {employee_image_id}, {employee_postal_code}, {employee_prefecture}, {employee_address}, {department_id}, {employee_start_date}, {employee_leave_date}, {employee_update_date}, {department_name}\n"
         # csv_employees += f"{employee_id}, {employee_name}\n"
 
     # employees = []
@@ -450,7 +450,9 @@ def csv_retrieve_employees(cursor):
 # 全社員情報をSQLで取得
 def get_csv_employee_query():
     cursor, cnx = get_connection()
-    employee_list = "SELECT * FROM employee_table"
+    employee_list = "SELECT id, employee_id, employee_name, employee_age, employee_gender, employee_image_id, employee_postal_code, employee_prefecture, employee_address, employee_table.department_id, employee_start_date, employee_leave_date, employee_update_date, department_name FROM employee_table JOIN department_table ON employee_table.department_id = department_table.department_id"
+    # employee_list = "SELECT * FROM employee_table JOIN department_table ON employee_table.department_id = department_table.department_id"
+    # employee_list = "SELECT * FROM employee_table"
     # employee_list = "SELECT employee_id, employee_name FROM employee_table"
     cursor.execute(employee_list)
     csv_employees = csv_retrieve_employees(cursor)
@@ -479,6 +481,70 @@ def get_csv_employee_query():
 #     cursor.execute(output_csvfile)
 #     return redirect('/')
 
+
+# 先に従業員追加の処理を実装して、そこでデータをinsertで入力する
+# 従業員の新規追加ボタンの実装
+@app.route("/add", methods=["GET", "POST"])
+def employee_add():
+    # ここではformで送信された値を受け取っている
+    # 新規登録を実行したあとはこちらで受け取っている
+    if "employee_image" in request.files:
+        employee_id = request.form.get("employee_id", "")
+        employee_name = request.form.get("employee_name", "")
+        employee_age = request.form.get("employee_age", "")
+        employee_gender = request.form.get("employee_gender", "")
+        employee_image = request.files["employee_image"]
+        employee_postal_code = request.form.get("employee_postal_code", "")
+        employee_prefecture = request.form.get("employee_prefecture", "")
+        employee_address = request.form.get("employee_address", "")
+        department_name_id = request.form.get("department_name", "")
+        # department_name = request.form.get("department_name", "")
+        # department_id = request.form.get("department_id", "")
+        employee_start_date = request.form.get("employee_start_date", "")
+        employee_leave_date = request.form.get("employee_leave_date", "")
+
+        # とりあえず、formで値が送られているかチャックするロジックを書いてみよう
+        if employee_id == "" or employee_name == "" or employee_age == "" or employee_gender == "" or employee_image == "" or employee_postal_code == "" or employee_prefecture == "" or employee_address == "" or employee_start_date == "":
+            flash("入力される情報に不備があったため、登録に失敗しました")
+            return redirect("/")
+        else:
+            # department_nameとdepartment_idのvalueを分割してみる
+            department_array = department_name_id.split("&")
+            department_name = department_array[0]
+            department_id = department_array[1]
+
+            # このIDにはランダムな文字列を生成して代入する、生成ロジックは別関数で作成する
+            employee_image_id = create_employee_image_id()
+            # このdepartment_idは生成せずに選択された既存のidを使用する
+            # department_id = create_department_id()
+            filename = save_filename(employee_image)
+            add_employee(employee_id, employee_name, employee_age, employee_gender, employee_image_id, employee_postal_code, employee_prefecture, employee_address, department_id, employee_start_date, employee_leave_date, filename, department_name)
+            # params = {
+            # "employee_information" : employee_information
+            # }
+            flash("新規追加することに成功したよ！")
+            return redirect("/")
+    # else:
+    #     flash("ようこそ、社員情報追加のページへ", "")
+    #     # ここで部署のリストを渡している
+    #     department = get_department_query()
+    #     params = {
+    #     "department" : department
+    #     }
+    # # return render_template("employee_add.html", **params)
+    # return render_template("employee_add.html", **params)
+
+    # 新規追加はこっちでやる
+    flash("ようこそ、社員情報追加のページへ", "")
+    # ここで部署のリストを渡している
+    department = get_department_query()
+    # test = ""
+    params = {
+    "department" : department
+    # "test" : test
+    }
+    # return render_template("employee_add.html", **params)
+    return render_template("employee_add.html", **params)
 
 
 
