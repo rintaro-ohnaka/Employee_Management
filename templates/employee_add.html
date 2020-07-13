@@ -6,6 +6,10 @@
     li{
         color: red;
     }
+    img{
+        width: 300px;
+        height: 300px;
+    }
 </style>
 </head>
 <body>
@@ -39,6 +43,8 @@
             <p>性別：<input type="radio" name="employee_gender" value="男性">男性
             <input type="radio" name="employee_gender" value="女性">女性
             <input type="radio" name="employee_gender" value="その他">その他</p>
+
+            <p><img src="{{item.employee_image}}" alt=""></p>
 
             <p><label for="">写真：</label>
             <input type="file" name="employee_image" value="{{item.employee_image_id}}"></p>

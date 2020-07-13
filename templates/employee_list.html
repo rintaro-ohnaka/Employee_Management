@@ -51,7 +51,8 @@
         </td>
         <td>
             <form method="post" action="/delete_employee">
-                <input type="hidden" name="employee_id" value="{{item.employee_id}}">
+                <input type="hidden" name="employee_id" value="{{item.id}}">
+                <!-- <input type="hidden" name="employee_id" value="{{item.employee_id}}"> -->
                 <button type="submit">削除</button>
             </form>
         </td>

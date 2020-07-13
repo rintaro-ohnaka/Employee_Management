@@ -124,6 +124,7 @@ def check_add_employee(employee_id, employee_name, employee_age, employee_gender
         # execute_add_employee(employee_id, employee_name, employee_age, employee_gender, employee_image, employee_postal_code, employee_prefecture, employee_address, department_id, employee_start_date, employee_leave_date, department_name)
         employee_image_id = create_employee_image_id()
         filename = save_filename(employee_image)
+        execute_add_employee(employee_id, employee_name, employee_age, employee_gender, employee_image_id, employee_postal_code, employee_prefecture, employee_address, department_id, employee_start_date, employee_leave_date, filename, department_name)
         flash("新規追加することに成功したよ！")
 
 # 実際に社員情報を追加する関数
@@ -142,7 +143,7 @@ def save_filename(employee_image):
     return filename
 
 # DBに保存を実行
-def add_employee(employee_id, employee_name, employee_age, employee_gender, employee_image_id, employee_postal_code, employee_prefecture, employee_address, department_id, employee_start_date, employee_leave_date, filename, department_name):
+def execute_add_employee(employee_id, employee_name, employee_age, employee_gender, employee_image_id, employee_postal_code, employee_prefecture, employee_address, department_id, employee_start_date, employee_leave_date, filename, department_name):
     cursor, cnx = get_connection()
     query_employee = add_query_employee_table(employee_id, employee_name, employee_age, employee_gender, employee_image_id, employee_postal_code, employee_prefecture, employee_address, department_id, employee_start_date, employee_leave_date)
     query_employee_image = add_query_employee_image_table(employee_image_id, filename)
@@ -200,17 +201,26 @@ def add_query_department_table(department_id, department_name):
 @app.route("/show_edit_employee", methods=["GET", "POST"])
 def show_edit_employee():
     cursor, cnx = get_connection()
-    id = int(request.form.get("id", ""))
+    # id = int(request.form.get("id", ""))
+
+    id = request.form.get("id", "")
+    # if id == str:
+    #     id = int(id)
+
     # 部署一覧を取得している
     department = get_department_query()
     # 選択した社員の全てのステータスをここで取得
-    get_query_employee_information = f"SELECT * FROM employee_table WHERE id = {id} "
+    get_query_employee_information = f"SELECT id, employee_id, employee_name, employee_age, employee_gender, employee_table.employee_image_id, employee_postal_code, employee_prefecture, employee_address, department_id, employee_start_date, employee_leave_date, employee_update_date, employee_image FROM employee_table JOIN employee_image_table ON employee_table.employee_image_id = employee_image_table.employee_image_id WHERE employee_table.id = {id} "
+    # get_query_employee_information = f"SELECT * FROM employee_table WHERE id = {id} "
     cursor.execute(get_query_employee_information)
 
     employees = []
-    for (id, employee_id, employee_name, employee_age, employee_gender, employee_image_id, employee_postal_code, employee_prefecture, employee_address, department_id, employee_start_date, employee_leave_date, employee_update_date) in cursor:
-        item = { "id":id, "employee_id":employee_id, "employee_name":employee_name, "employee_age":employee_age, "employee_gender":employee_gender, "employee_image_id":employee_image_id, "employee_postal_code":employee_postal_code, "employee_prefecture":employee_prefecture, "employee_address":employee_address, "department_id":department_id, "employee_start_date":employee_start_date, "employee_leave_date":employee_leave_date, "employee_update_date":employee_update_date}
+    for (id, employee_id, employee_name, employee_age, employee_gender, employee_image_id, employee_postal_code, employee_prefecture, employee_address, department_id, employee_start_date, employee_leave_date, employee_update_date, employee_image) in cursor:
+        item = { "id":id, "employee_id":employee_id, "employee_name":employee_name, "employee_age":employee_age, "employee_gender":employee_gender, "employee_image_id":employee_image_id, "employee_postal_code":employee_postal_code, "employee_prefecture":employee_prefecture, "employee_address":employee_address, "department_id":department_id, "employee_start_date":employee_start_date, "employee_leave_date":employee_leave_date, "employee_update_date":employee_update_date, "employee_image":employee_image}
         employees.append(item)
+    # for (id, employee_id, employee_name, employee_age, employee_gender, employee_image_id, employee_postal_code, employee_prefecture, employee_address, department_id, employee_start_date, employee_leave_date, employee_update_date) in cursor:
+    #     item = { "id":id, "employee_id":employee_id, "employee_name":employee_name, "employee_age":employee_age, "employee_gender":employee_gender, "employee_image_id":employee_image_id, "employee_postal_code":employee_postal_code, "employee_prefecture":employee_prefecture, "employee_address":employee_address, "department_id":department_id, "employee_start_date":employee_start_date, "employee_leave_date":employee_leave_date, "employee_update_date":employee_update_date}
+    #     employees.append(item)
     
     
     params = {
@@ -423,8 +433,8 @@ def get_query_search_employee(get_query_search_employee_table, department_name, 
 # 検索した従業員データを取得し、配列に代入する
 def retrieve_serarch_employees(cursor):
     search_employees = []
-    for (employee_id, employee_name, department_name) in cursor:
-        item = {"employee_id":employee_id, "employee_name":employee_name, "department_name":department_name}
+    for (id, employee_id, employee_name, department_name) in cursor:
+        item = {"id":id, "employee_id":employee_id, "employee_name":employee_name, "department_name":department_name}
         search_employees.append(item)
     return search_employees
 
@@ -442,7 +452,7 @@ def employee_search():
     cursor, cnx = get_connection()
     department_name, search_employee_id, search_employee_name = get_request_employee()
 
-    get_query_search_employee_table = "SELECT employee_id, employee_name, department_name FROM employee_table JOIN department_table ON employee_table.department_id = department_table.department_id WHERE employee_id IS NOT NULL"
+    get_query_search_employee_table = "SELECT id, employee_id, employee_name, department_name FROM employee_table JOIN department_table ON employee_table.department_id = department_table.department_id WHERE employee_id IS NOT NULL"
     get_query_search_employee_table = get_query_search_employee(get_query_search_employee_table, department_name, search_employee_id, search_employee_name)
 
     cursor.execute(get_query_search_employee_table)
