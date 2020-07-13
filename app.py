@@ -7,6 +7,7 @@ from flask import render_template
 import mysql.connector
 from mysql.connector import errorcode
 import os
+import random, string
 from werkzeug.utils import secure_filename
 UPLOAD_FOLDER = './static/'
 ALLOWED_EXTENSIONS = {'png', 'jpeg'}
@@ -60,7 +61,7 @@ def employee_list():
 
 
 # ランダムな文字列を生成する
-import random, string
+# import random, string
 # def randomname(n):
 #    randlst = [random.choice(string.ascii_letters + string.digits) for i in range(n)]
 #    return ''.join(randlst)
@@ -92,7 +93,7 @@ def show_add_page():
 def add_employee():
     employee_id, employee_name, employee_age, employee_gender, employee_image, employee_postal_code, employee_prefecture, employee_address, department_name_id, employee_start_date, employee_leave_date, department_name, department_id = request_add_employee()
     check_add_employee(employee_id, employee_name, employee_age, employee_gender, employee_image, employee_postal_code, employee_prefecture, employee_address, department_id, employee_start_date, employee_leave_date, department_name)
-    return redirect("/")
+    return render_template("result.html")
 
 
 # 新規追加のリクエストを受ける関数
@@ -120,16 +121,18 @@ def check_add_employee(employee_id, employee_name, employee_age, employee_gender
     if employee_id == "" or employee_name == "" or employee_age == "" or employee_gender == "" or employee_image == "" or employee_postal_code == "" or employee_prefecture == "" or employee_address == "" or employee_start_date == "":
         flash("入力される情報に不備があったため、登録に失敗しました")
     else:
-        execute_add_employee(employee_id, employee_name, employee_age, employee_gender, employee_image, employee_postal_code, employee_prefecture, employee_address, department_id, employee_start_date, employee_leave_date, department_name)
+        # execute_add_employee(employee_id, employee_name, employee_age, employee_gender, employee_image, employee_postal_code, employee_prefecture, employee_address, department_id, employee_start_date, employee_leave_date, department_name)
+        employee_image_id = create_employee_image_id()
+        filename = save_filename(employee_image)
         flash("新規追加することに成功したよ！")
 
 # 実際に社員情報を追加する関数
-def execute_add_employee(employee_id, employee_name, employee_age, employee_gender, employee_image, employee_postal_code, employee_prefecture, employee_address, department_id, employee_start_date, employee_leave_date, department_name):
-    employee_image_id = create_employee_image_id()
-    filename = save_filename(employee_image)
-    # これいる？
-    add_employee(employee_id, employee_name, employee_age, employee_gender, employee_image_id, employee_postal_code, employee_prefecture, employee_address, department_id, employee_start_date, employee_leave_date, filename, department_name)
-    return
+# def execute_add_employee(employee_id, employee_name, employee_age, employee_gender, employee_image, employee_postal_code, employee_prefecture, employee_address, department_id, employee_start_date, employee_leave_date, department_name):
+#     employee_image_id = create_employee_image_id()
+#     filename = save_filename(employee_image)
+#     # これいる？
+#     # add_employee(employee_id, employee_name, employee_age, employee_gender, employee_image_id, employee_postal_code, employee_prefecture, employee_address, department_id, employee_start_date, employee_leave_date, filename, department_name)
+#     return
 
 
 # 画像を保存する関数
@@ -218,55 +221,7 @@ def show_edit_employee():
     return render_template("employee_add.html", **params)
 
 
-# 社員情報を編集するロジックを記述
-# @app.route("/edit_employee", methods=["GET", "POST"])
-def edit_employee_before():
-    cursor, cnx = get_connection()
-    if "employee_image" in request.files:
-        id = int(request.form.get("id", ""))
-        employee_id = request.form.get("employee_id", "")
-        employee_name = request.form.get("employee_name", "")
-        employee_age = request.form.get("employee_age", "")
-        employee_gender = request.form.get("employee_gender", "")
-        employee_image = request.files["employee_image"]
-        employee_postal_code = request.form.get("employee_postal_code", "")
-        employee_prefecture = request.form.get("employee_prefecture", "")
-        employee_address = request.form.get("employee_address", "")
-        department_name_id = request.form.get("department_name", "")
-        employee_start_date = request.form.get("employee_start_date", "")
-        employee_leave_date = request.form.get("employee_leave_date", "")
 
-        # department_nameとdepartment_idのvalueを分割してみる
-        department_array = department_name_id.split("&")
-        department_name = department_array[0]
-        department_id = department_array[1]
-
-        # このIDにはランダムな文字列を生成して代入する、生成ロジックは別関数で作成する
-        employee_image_id = create_employee_image_id()
-        filename = save_filename(employee_image)
-
-    get_query_update_employee = f"UPDATE employee_table SET \
-    employee_id = '{employee_id}', \
-    employee_name = '{employee_name}', \
-    employee_age = '{employee_age}', \
-    employee_gender = '{employee_gender}', \
-    employee_image_id = '{employee_image_id}', \
-    employee_postal_code = '{employee_postal_code}', \
-    employee_prefecture = '{employee_prefecture}', \
-    employee_address = '{employee_address}', \
-    department_id = '{department_id}', \
-    employee_start_date = '{employee_start_date}', \
-    employee_leave_date = '{employee_leave_date}' \
-    WHERE id = {id} "
-    
-    cursor.execute(get_query_update_employee)
-    cnx.commit()
-
-    return redirect('/')
-
-    # get_query_update_employee = f"UPDATE "
-    # cursor.execute(get_query_update_employee)
-    # cnx.commit()
 
 
 # 社員情報を編集する機能をまとめて関数になる
@@ -276,7 +231,7 @@ def edit_employee():
     # employee_image_id = create_employee_image_id()
     # filename = save_filename(employee_image)
     check_edit_employee(id, employee_id, employee_name, employee_age, employee_gender, employee_image, employee_postal_code, employee_prefecture, employee_address, department_id, employee_start_date, employee_leave_date, department_name)
-    return redirect("/")
+    return render_template("result.html")
 
 # 社員情報編集時のリクエストを受けとる関数
 def request_edit_employee():
@@ -623,6 +578,56 @@ def employee_add():
     # return render_template("employee_add.html", **params)
     return render_template("employee_add.html", **params)
 
+
+# 社員情報を編集するロジックを記述
+# @app.route("/edit_employee", methods=["GET", "POST"])
+def edit_employee_before():
+    cursor, cnx = get_connection()
+    if "employee_image" in request.files:
+        id = int(request.form.get("id", ""))
+        employee_id = request.form.get("employee_id", "")
+        employee_name = request.form.get("employee_name", "")
+        employee_age = request.form.get("employee_age", "")
+        employee_gender = request.form.get("employee_gender", "")
+        employee_image = request.files["employee_image"]
+        employee_postal_code = request.form.get("employee_postal_code", "")
+        employee_prefecture = request.form.get("employee_prefecture", "")
+        employee_address = request.form.get("employee_address", "")
+        department_name_id = request.form.get("department_name", "")
+        employee_start_date = request.form.get("employee_start_date", "")
+        employee_leave_date = request.form.get("employee_leave_date", "")
+
+        # department_nameとdepartment_idのvalueを分割してみる
+        department_array = department_name_id.split("&")
+        department_name = department_array[0]
+        department_id = department_array[1]
+
+        # このIDにはランダムな文字列を生成して代入する、生成ロジックは別関数で作成する
+        employee_image_id = create_employee_image_id()
+        filename = save_filename(employee_image)
+
+    get_query_update_employee = f"UPDATE employee_table SET \
+    employee_id = '{employee_id}', \
+    employee_name = '{employee_name}', \
+    employee_age = '{employee_age}', \
+    employee_gender = '{employee_gender}', \
+    employee_image_id = '{employee_image_id}', \
+    employee_postal_code = '{employee_postal_code}', \
+    employee_prefecture = '{employee_prefecture}', \
+    employee_address = '{employee_address}', \
+    department_id = '{department_id}', \
+    employee_start_date = '{employee_start_date}', \
+    employee_leave_date = '{employee_leave_date}' \
+    WHERE id = {id} "
+    
+    cursor.execute(get_query_update_employee)
+    cnx.commit()
+
+    return redirect('/')
+
+    # get_query_update_employee = f"UPDATE "
+    # cursor.execute(get_query_update_employee)
+    # cnx.commit()
 
 
 # 社員情報の検索

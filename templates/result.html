@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<title>社員情報一覧</title>
+<style type="text/css">
+
+</style>
+</head>
+<body>
+<h1>結果ページ</h1>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <ul class=flashes>
+    {% for category, message in messages %}
+      <li class="{{ category }}">{{ message }}</li>
+    {% endfor %}
+    </ul>
+  {% endif %}
+{% endwith %}
+
+
+<p><form method="post" action="/add">
+    <button type="submit">新規追加</button>
+</form></p>
+
+<p><form method="post" action="/search">
+    <button type="submit">検索</button>
+</form></p>
+
+<p><form method="post" action="/">
+    <p><button type="submit">社員情報一覧へ戻る</button></p>
+</form></p>
+
+
+</body>
+</html>
