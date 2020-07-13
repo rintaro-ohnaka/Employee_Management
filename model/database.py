@@ -1,5 +1,6 @@
 import mysql.connector
 from model.const import DB
+from model.item import Employee, Department
 
 # DB接続
 def get_connection():
@@ -12,7 +13,9 @@ def get_connection():
 def retrieve_employees(cursor):
     employees = []
     for (id, employee_id, employee_name, employee_age, employee_gender, employee_image_id, employee_postal_code, employee_prefecture, employee_address, department_id, employee_start_date, employee_leave_date, employee_update_date) in cursor:
-        item = { "id":id, "employee_id":employee_id, "employee_name":employee_name, "employee_age":employee_age, "employee_gender":employee_gender, "employee_image_id":employee_image_id, "employee_postal_code":employee_postal_code, "employee_prefecture":employee_prefecture, "employee_address":employee_address, "department_id":department_id, "employee_start_date":employee_start_date, "employee_leave_date":employee_leave_date, "employee_update_date":employee_update_date}
+        # ここでクラスを使っている
+        item = Employee(id, employee_id, employee_name, employee_age, employee_gender, employee_image_id, employee_postal_code, employee_prefecture, employee_address, department_id, employee_start_date, employee_leave_date, employee_update_date)
+        # item = { "id":id, "employee_id":employee_id, "employee_name":employee_name, "employee_age":employee_age, "employee_gender":employee_gender, "employee_image_id":employee_image_id, "employee_postal_code":employee_postal_code, "employee_prefecture":employee_prefecture, "employee_address":employee_address, "department_id":department_id, "employee_start_date":employee_start_date, "employee_leave_date":employee_leave_date, "employee_update_date":employee_update_date}
         employees.append(item)
     return employees
 
@@ -82,7 +85,8 @@ def get_query_update_employee(id, employee_id, employee_name, employee_age, empl
 def retrieve_edit_employee(cursor):
     employees = []
     for (id, employee_id, employee_name, employee_age, employee_gender, employee_image_id, employee_postal_code, employee_prefecture, employee_address, department_id, employee_start_date, employee_leave_date, employee_update_date, employee_image) in cursor:
-        item = { "id":id, "employee_id":employee_id, "employee_name":employee_name, "employee_age":employee_age, "employee_gender":employee_gender, "employee_image_id":employee_image_id, "employee_postal_code":employee_postal_code, "employee_prefecture":employee_prefecture, "employee_address":employee_address, "department_id":department_id, "employee_start_date":employee_start_date, "employee_leave_date":employee_leave_date, "employee_update_date":employee_update_date, "employee_image":employee_image}
+        item = Employee(id, employee_id, employee_name, employee_age, employee_gender, employee_image_id, employee_postal_code, employee_prefecture, employee_address, department_id, employee_start_date, employee_leave_date, employee_update_date, employee_image)
+        # item = { "id":id, "employee_id":employee_id, "employee_name":employee_name, "employee_age":employee_age, "employee_gender":employee_gender, "employee_image_id":employee_image_id, "employee_postal_code":employee_postal_code, "employee_prefecture":employee_prefecture, "employee_address":employee_address, "department_id":department_id, "employee_start_date":employee_start_date, "employee_leave_date":employee_leave_date, "employee_update_date":employee_update_date, "employee_image":employee_image}
         employees.append(item)
     return employees
 
@@ -91,7 +95,8 @@ def retrieve_edit_employee(cursor):
 def retrieve_department(cursor):
     department = []
     for (department_id, department_name) in cursor:
-        item = {"department_id":department_id, "department_name":department_name}
+        item = Department(department_id, department_name)
+        # item = {"department_id":department_id, "department_name":department_name}
         department.append(item)
     return department
 
