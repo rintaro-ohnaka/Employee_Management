@@ -38,28 +38,12 @@
 ②部署情報を削除すること  
 
 ## 社員情報管理ツールの基本的な処理はapp.pyに保存してあります。  
-### １、管理者ページの処理：app.pyの696行目〜942行目
-  ・画像を保存する 766-769  
-  ・DB接続 774-777  
-  ・商品配列に商品を入れている 780-785  
-  ・商品取得 788-795  
-  ・管理者画面表示 799-807  
-  ・商品追加のSQL取得 812-818  
-  ・商品追加 822-830  
-  ・商品の追加成功可否メッセージ 833-842  
-  ・新規商品追加 847-857  
-  ・在庫数変更 905-914  
-  ・公開非公開のSQL取得 919-921  
-  ・公開非公開実行 924-931  
-  ・公開非公開メッセージ分岐 934-945  
+### app.py
 
-### ２、購入者ページの処理：app.pyの978行目〜1080行目
-  ・商品購入分岐 982-1004  
-  ・商品選択 1021-1033  
-  ・お釣り計算 1036-1041  
-  ・在庫数を一つ減らす 1054-1058  
-  ・在庫削除実行 1061-1069  
-  ・購入者画面表示 1075-1083  
+### model/database.py
+
+### model/item.py  
+### model/const.py  
 
 ## 社員情報管理ツールのHTMLは8つ存在します。  
 ### １、templates/employee_list.html  
@@ -68,17 +52,17 @@
   社員情報追加編集ページのHTMLです。  
 ### ３、templates/department_list.html  
   部署一覧ページのHTMLです。  
-### ３、templates/department_add.html  
+### 4、templates/department_add.html  
   部署情報追加編集ページのHTMLです。  
-### ３、templates/employee_search.html  
+### 5、templates/employee_search.html  
   社員情報検索ページのHTMLです。  
-### ３、templates/search_result.html  
+### 6、templates/search_result.html  
   社員検索結果ページのHTMLです。  
-### ３、templates/add_result.html  
+### 7、templates/add_result.html  
   追加結果ページのHTMLです。  
   
 ## テーブル作成に使用するSQLファイルは以下の通りです。  
 ### employees.sql   
 
 ## 外部ライブラリを管理するファイルは以下の通りです。
-### １、requirements.txt
+### requirements.txt
