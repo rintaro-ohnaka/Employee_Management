@@ -458,7 +458,7 @@ def employee_search():
 @app.route('/download', methods=["GET", "POST"])
 def download():
 
-    cursor, cnx = get_connection()
+    cursor, cnx = db.get_connection()
     csv_employees = db.get_csv_employee_query()
     csv = ""
     csv = csv_employees

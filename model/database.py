@@ -1,6 +1,7 @@
 import mysql.connector
 from model.const import DB
 from model.item import Employee, Department
+# from model.item import Department
 
 # DB接続
 def get_connection():
