@@ -79,6 +79,13 @@ def get_query_update_employee(id, employee_id, employee_name, employee_age, empl
     WHERE id = {id} "
     return query_update_employee
 
+def retrieve_edit_employee(cursor):
+    employees = []
+    for (id, employee_id, employee_name, employee_age, employee_gender, employee_image_id, employee_postal_code, employee_prefecture, employee_address, department_id, employee_start_date, employee_leave_date, employee_update_date, employee_image) in cursor:
+        item = { "id":id, "employee_id":employee_id, "employee_name":employee_name, "employee_age":employee_age, "employee_gender":employee_gender, "employee_image_id":employee_image_id, "employee_postal_code":employee_postal_code, "employee_prefecture":employee_prefecture, "employee_address":employee_address, "department_id":department_id, "employee_start_date":employee_start_date, "employee_leave_date":employee_leave_date, "employee_update_date":employee_update_date, "employee_image":employee_image}
+        employees.append(item)
+    return employees
+
 
 # 部署を受け取る
 def retrieve_department(cursor):
