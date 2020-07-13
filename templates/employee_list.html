@@ -34,6 +34,7 @@
     <tr>
         <th>社員ID</th>
         <th>名前</th>
+        <th>年齢</th>
         <th>編集</th>
         <th>削除</th>
     </tr>
@@ -42,6 +43,7 @@
     <tr>
         <td>{{ item.employee_id }}</td>
         <td>{{ item.employee_name }}</td>
+        <td>{{ item.employee_age }}</td>
         <td>
             <form method="post" action="/show_edit_employee">
                 <input type="hidden" name="id" value="{{item.id}}">

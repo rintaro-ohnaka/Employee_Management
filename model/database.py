@@ -1,6 +1,6 @@
 import mysql.connector
 from model.const import DB
-from model.item import Employee, Department
+from model.item import Employee, Department, EmpDept
 # from model.item import Department
 
 # DB接続
@@ -140,7 +140,8 @@ def get_query_search_employee(get_query_search_employee_table, department_name, 
 def retrieve_serarch_employees(cursor):
     search_employees = []
     for (id, employee_id, employee_name, department_name) in cursor:
-        item = {"id":id, "employee_id":employee_id, "employee_name":employee_name, "department_name":department_name}
+        item = EmpDept(id, employee_id, employee_name, department_name)
+        # item = {"id":id, "employee_id":employee_id, "employee_name":employee_name, "department_name":department_name}
         search_employees.append(item)
     return search_employees
 
