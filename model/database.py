@@ -2,6 +2,13 @@ import mysql.connector
 from model.const import DB
 from model.item import Employee, Department, EmpDept
 # from model.item import Department
+# from werkzeug.utils import secure_filename
+# import os
+
+# UPLOAD_FOLDER = './static/'
+# ALLOWED_EXTENSIONS = {'png', 'jpeg'}
+# app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+# database.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 # DB接続
 def get_connection():
@@ -67,6 +74,7 @@ def add_query_department_table(department_id, department_name):
     query_department = f"INSERT INTO department_table (department_id, department_name, department_create_date, department_update_date) VALUES ('{department_id}', '{department_name}', LOCALTIME(), LOCALTIME())"
     return query_department
 
+
 # updateのクエリ取得
 def get_query_update_employee(id, employee_id, employee_name, employee_age, employee_gender, employee_image_id, employee_postal_code, employee_prefecture, employee_address, employee_start_date, employee_leave_date, department_name, department_id):
     query_update_employee = f"UPDATE employee_table SET \
@@ -83,6 +91,21 @@ def get_query_update_employee(id, employee_id, employee_name, employee_age, empl
     employee_leave_date = '{employee_leave_date}' \
     WHERE id = {id} "
     return query_update_employee
+
+# 社員情報編集時の基準クエリを作り、変更が必要な分だけ、追加していく
+# どうしても最初から値が入力されていない、画像、性別、都道府県を追加していく方式にしてみる
+def create_query_update_employee(id, employee_id, employee_name, employee_age, employee_gender, employee_image, employee_postal_code, employee_prefecture, employee_address, employee_start_date, employee_leave_date, department_name, department_id):
+    # これが基準のクエリ
+    query_update = f"UPDATE employee_table SET \
+    employee_id = '{employee_id}', \
+    employee_name = '{employee_name}', \
+    employee_age = '{employee_age}', \
+    employee_postal_code = '{employee_postal_code}', \
+    employee_address = '{employee_address}', \
+    employee_start_date = '{employee_start_date}', \
+    employee_leave_date = '{employee_leave_date}'"
+
+    return query_update
 
 def retrieve_edit_employee(cursor):
     employees = []

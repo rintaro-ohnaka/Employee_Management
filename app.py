@@ -138,10 +138,8 @@ def execute_add_employee(employee_id, employee_name, employee_age, employee_gend
     cursor, cnx = db.get_connection()
     query_employee = db.add_query_employee_table(employee_id, employee_name, employee_age, employee_gender, employee_image_id, employee_postal_code, employee_prefecture, employee_address, department_id, employee_start_date, employee_leave_date)
     query_employee_image = db.add_query_employee_image_table(employee_image_id, filename)
-    # query_department = add_query_department_table(department_id, department_name)
     cursor.execute(query_employee)
     cursor.execute(query_employee_image)
-    # cursor.execute(query_department)
     cnx.commit()
     # return redirect("/")
 
@@ -258,15 +256,39 @@ def request_edit_employee():
     return id, employee_id, employee_name, employee_age, employee_gender, employee_image, employee_postal_code, employee_prefecture, employee_address, employee_start_date, employee_leave_date, department_name, department_id
 
 # 実際に変更を実行している関数
+# def execute_edit_employee(id, employee_id, employee_name, employee_age, employee_gender, employee_image, employee_postal_code, employee_prefecture, employee_address, employee_start_date, employee_leave_date, department_name, department_id):
+#     cursor, cnx = db.get_connection()
+#     employee_image_id = create_employee_image_id()
+#     filename = save_filename(employee_image)
+
+#     query_update_employee = db.get_query_update_employee(id, employee_id, employee_name, employee_age, employee_gender, employee_image_id, employee_postal_code, employee_prefecture, employee_address, employee_start_date, employee_leave_date, department_name, department_id)
+#     cursor.execute(query_update_employee)
+#     cnx.commit()
+#     return
+
+# こっちで新しいの作ってみる
 def execute_edit_employee(id, employee_id, employee_name, employee_age, employee_gender, employee_image, employee_postal_code, employee_prefecture, employee_address, employee_start_date, employee_leave_date, department_name, department_id):
     cursor, cnx = db.get_connection()
-    employee_image_id = create_employee_image_id()
-    filename = save_filename(employee_image)
-
-    query_update_employee = db.get_query_update_employee(id, employee_id, employee_name, employee_age, employee_gender, employee_image_id, employee_postal_code, employee_prefecture, employee_address, employee_start_date, employee_leave_date, department_name, department_id)
-    cursor.execute(query_update_employee)
+    # employee_image_id = create_employee_image_id()
+    # query_update = db.create_query_update_employee(id, employee_id, employee_name, employee_age, employee_gender, employee_image, employee_postal_code, employee_prefecture, employee_address, employee_start_date, employee_leave_date, department_name, department_id)
+    query_update = get_query_edit_employee(id, employee_id, employee_name, employee_age, employee_gender, employee_image, employee_postal_code, employee_prefecture, employee_address, employee_start_date, employee_leave_date, department_name, department_id)
+    cursor.execute(query_update)
     cnx.commit()
     return
+
+def get_query_edit_employee(id, employee_id, employee_name, employee_age, employee_gender, employee_image, employee_postal_code, employee_prefecture, employee_address, employee_start_date, employee_leave_date, department_name, department_id):
+    query_update = db.create_query_update_employee(id, employee_id, employee_name, employee_age, employee_gender, employee_image, employee_postal_code, employee_prefecture, employee_address, employee_start_date, employee_leave_date, department_name, department_id)
+    if employee_image.filename != "":
+        employee_image_id = create_employee_image_id()
+        query_update += f", employee_image_id = '{employee_image_id}'"
+        filename = save_filename(employee_image)
+    if employee_gender != "":
+        query_update += f", employee_gender = '{employee_gender}'"
+    if employee_prefecture != "":
+        query_update += f", employee_prefecture = '{employee_prefecture}'"
+
+    query_update += f" WHERE id = {id}"
+    return query_update
 
 # 移動
 # updateのクエリ取得
@@ -289,7 +311,8 @@ def execute_edit_employee(id, employee_id, employee_name, employee_age, employee
 # 編集時のform入力に不備がないかのチェック関数
 def check_edit_employee(id, employee_id, employee_name, employee_age, employee_gender, employee_image, employee_postal_code, employee_prefecture, employee_address, department_id, employee_start_date, employee_leave_date, department_name):
     # とりあえず、formで値が送られているかチャックするロジックを書いてみよう
-    if employee_id == "" or employee_name == "" or employee_age == "" or employee_gender == "" or employee_image == "" or employee_postal_code == "" or employee_prefecture == "" or employee_address == "" or employee_start_date == "":
+    if employee_id == "" or employee_name == "" or employee_age == "" or employee_postal_code == "" or employee_address == "" or employee_start_date == "":
+    # if employee_id == "" or employee_name == "" or employee_age == "" or employee_gender == "" or employee_image == "" or employee_postal_code == "" or employee_prefecture == "" or employee_address == "" or employee_start_date == "":
         flash("入力される情報に不備があったため、登録に失敗しました", "")
     else:
         execute_edit_employee(id, employee_id, employee_name, employee_age, employee_gender, employee_image, employee_postal_code, employee_prefecture, employee_address, employee_start_date, employee_leave_date, department_name, department_id)
@@ -300,10 +323,12 @@ def check_edit_employee(id, employee_id, employee_name, employee_age, employee_g
 # 社員情報を削除
 @app.route("/delete_employee", methods=["GET", "POST"])
 def delete_employee():
-    cursor, cnx = get_connection()
-    employee_id = request.form.get("employee_id", "")
+    cursor, cnx = db.get_connection()
+    id = request.form.get("employee_id", "")
+    # employee_id = request.form.get("employee_id", "")
 
-    get_query_delete_employee = f"DELETE FROM employee_table WHERE employee_id = '{employee_id}' "
+    get_query_delete_employee = f"DELETE FROM employee_table WHERE id = {id} "
+    # get_query_delete_employee = f"DELETE FROM employee_table WHERE employee_id = '{employee_id}' "
     cursor.execute(get_query_delete_employee)
     cnx.commit()
 
