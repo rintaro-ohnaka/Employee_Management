@@ -318,6 +318,10 @@ def check_edit_employee(id, employee_id, employee_name, employee_age, employee_g
     if employee_id == "" or employee_name == "" or employee_age == "" or employee_postal_code == "" or employee_address == "" or employee_start_date == "":
     # if employee_id == "" or employee_name == "" or employee_age == "" or employee_gender == "" or employee_image == "" or employee_postal_code == "" or employee_prefecture == "" or employee_address == "" or employee_start_date == "":
         flash("入力される情報に不備があったため、登録に失敗しました", "")
+    elif not employee_age.isdecimal():
+        flash("年齢は数字で入れてくれ", "")
+    elif not employee_postal_code.isdecimal():
+        flash("郵便番号は数字だけ入れてくれ", "")
     else:
         execute_edit_employee(id, employee_id, employee_name, employee_age, employee_gender, employee_image, employee_postal_code, employee_prefecture, employee_address, employee_start_date, employee_leave_date, department_name, department_id)
         flash("編集することに成功したよ！", "")
