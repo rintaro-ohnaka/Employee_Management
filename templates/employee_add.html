@@ -108,6 +108,7 @@
 
 
             <p>所属：<select name="department_name" id="">
+                <option value="" selected>選択してください</option>
                 {% for item in department %}
                 <option value="{{item.department_name}}&{{item.department_id}}">{{ item.department_name }}</option>
                 <!-- <input type="hidden" name="department_id" value="{{item.department_id}}"> -->
@@ -217,6 +218,7 @@
 
 
         <p>所属：<select name="department_name" id="">
+            <option value="" selected>選択してください</option>
             {% for item in department %}
             <option value="{{item.department_name}}&{{item.department_id}}">{{ item.department_name }}</option>
             <!-- <input type="hidden" name="department_id" value="{{item.department_id}}"> -->

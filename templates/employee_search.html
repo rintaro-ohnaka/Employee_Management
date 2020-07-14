@@ -17,6 +17,7 @@
 
 
     <p>所属部署：<select name="department_name" id="">
+        <option value="" selected>選択してください</option>
         {% for item in department %}
         <option value="{{item.department_name}}">{{ item.department_name }}</option>
         {% endfor %}
