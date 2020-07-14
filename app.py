@@ -353,9 +353,6 @@ def add_edit_department():
     else:
         db.create_department(change_department_name)
         flash("部署の新規追加に成功したよ")
-
-    # return render_template("department_list.html")
-    # return redirect("/department"
     return render_template("result.html")
 
 # 部署のリストから編集ボタンか新規追加を押した時、編集ページに飛ぶための関数

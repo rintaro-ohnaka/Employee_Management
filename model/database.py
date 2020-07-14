@@ -29,6 +29,7 @@ def get_employee_query():
     employees = retrieve_employees(cursor)
     return employees
 
+# 社員追加クエリ
 def add_query_employee_table(employee_id, employee_name, employee_age, employee_gender, employee_image_id, employee_postal_code, employee_prefecture, employee_address, department_id, employee_start_date, employee_leave_date):
     query_employee = f"INSERT INTO employee_table (\
     employee_id,\
