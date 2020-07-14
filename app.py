@@ -384,7 +384,7 @@ def add_edit_department():
     elif change_department_name == "":
         flash("部署名が入力されてないよ")
     else:
-        db.create_department(change_department_name)
+        create_department(change_department_name)
         flash("部署の新規追加に成功したよ")
     return render_template("result.html")
 
@@ -406,13 +406,13 @@ def connect_add_edit_department():
 
 # 移動
 # 部署の新規作成
-# def create_department(change_department_name):
-#     cursor, cnx = get_connection()
-#     department_id = create_department_id()
-#     # insert文
-#     get_query_create_department = f"INSERT INTO department_table (department_id, department_name) VALUES ('{department_id}', '{change_department_name}') "
-#     cursor.execute(get_query_create_department)
-#     cnx.commit()
+def create_department(change_department_name):
+    cursor, cnx = db.get_connection()
+    department_id = create_department_id()
+    # insert文
+    get_query_create_department = f"INSERT INTO department_table (department_id, department_name) VALUES ('{department_id}', '{change_department_name}') "
+    cursor.execute(get_query_create_department)
+    cnx.commit()
 
 # 部署の削除
 @app.route("/delete_department", methods=["GET", "POST"])

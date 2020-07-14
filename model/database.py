@@ -145,13 +145,13 @@ def change_department(change_department_name, department_name):
     cnx.commit()
 
 # 部署の新規作成
-def create_department(change_department_name):
-    cursor, cnx = get_connection()
-    department_id = create_department_id()
-    # insert文
-    get_query_create_department = f"INSERT INTO department_table (department_id, department_name) VALUES ('{department_id}', '{change_department_name}') "
-    cursor.execute(get_query_create_department)
-    cnx.commit()
+# def create_department(change_department_name):
+#     cursor, cnx = get_connection()
+#     department_id = create_department_id()
+#     # insert文
+#     get_query_create_department = f"INSERT INTO department_table (department_id, department_name) VALUES ('{department_id}', '{change_department_name}') "
+#     cursor.execute(get_query_create_department)
+#     cnx.commit()
 
 # 入力された値の情報を元に条件分岐
 def get_query_search_employee(get_query_search_employee_table, department_name, search_employee_id, search_employee_name):
@@ -174,17 +174,17 @@ def retrieve_serarch_employees(cursor):
 
 # ここに社員情報全部持ってくる、cursorのsqlを全てにする
 def csv_retrieve_employees(cursor):
-    csv_employees = "id, 社員ID, 氏名, 年齢, 性別, 画像ID, 郵便番号, 都道府県, 住所, 部署ID, 入社日, 退社日, 更新日, 部署名\n"
-    for (id, employee_id, employee_name, employee_age, employee_gender, employee_image_id, employee_postal_code, employee_prefecture, employee_address, department_id, employee_start_date, employee_leave_date, employee_update_date, department_name) in cursor:
+    csv_employees = "id, 社員ID, 氏名, 年齢, 性別, 画像ID, 郵便番号, 都道府県, 住所, 部署ID, 部署名, 入社日, 退社日, 更新日\n"
+    for (id, employee_id, employee_name, employee_age, employee_gender, employee_image_id, employee_postal_code, employee_prefecture, employee_address, department_id, department_name, employee_start_date, employee_leave_date, employee_update_date) in cursor:
 
-        csv_employees += f"{id}, {employee_id}, {employee_name}, {employee_age}, {employee_gender}, {employee_image_id}, {employee_postal_code}, {employee_prefecture}, {employee_address}, {department_id}, {employee_start_date}, {employee_leave_date}, {employee_update_date}, {department_name}\n"
+        csv_employees += f"{id}, {employee_id}, {employee_name}, {employee_age}, {employee_gender}, {employee_image_id}, {employee_postal_code}, {employee_prefecture}, {employee_address}, {department_id}, {department_name}, {employee_start_date}, {employee_leave_date}, {employee_update_date}\n"
 
     return csv_employees
 
 # 全社員情報をSQLで取得
 def get_csv_employee_query():
     cursor, cnx = get_connection()
-    employee_list = "SELECT id, employee_id, employee_name, employee_age, employee_gender, employee_image_id, employee_postal_code, employee_prefecture, employee_address, employee_table.department_id, employee_start_date, employee_leave_date, employee_update_date, department_name FROM employee_table JOIN department_table ON employee_table.department_id = department_table.department_id"
+    employee_list = "SELECT id, employee_id, employee_name, employee_age, employee_gender, employee_image_id, employee_postal_code, employee_prefecture, employee_address, employee_table.department_id, department_name, employee_start_date, employee_leave_date, employee_update_date FROM employee_table JOIN department_table ON employee_table.department_id = department_table.department_id"
     cursor.execute(employee_list)
     csv_employees = csv_retrieve_employees(cursor)
     return csv_employees
