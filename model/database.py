@@ -1,6 +1,6 @@
 import mysql.connector
 from model.const import DB
-from model.item import Employee, Department, EmpDept, EmpDeptImg
+from model.item import Employee, Department, EmpDept, EmpDeptImg, EmpDeptImgAll
 # from model.item import Department
 # from werkzeug.utils import secure_filename
 # import os
@@ -95,14 +95,16 @@ def get_query_update_employee(id, employee_id, employee_name, employee_age, empl
     WHERE id = {id} "
     return query_update_employee
 
+
 # 社員情報編集時の基準クエリを作り、変更が必要な分だけ、追加していく
 # どうしても最初から値が入力されていない、画像、性別、都道府県を追加していく方式にしてみる
-def create_query_update_employee(id, employee_id, employee_name, employee_age, employee_gender, employee_image, employee_postal_code, employee_prefecture, employee_address, employee_start_date, employee_leave_date, department_name, department_id):
+def create_query_update_employee(id, employee_id, employee_name, employee_age, employee_gender, employee_image, employee_image_id, employee_postal_code, employee_prefecture, employee_address, employee_start_date, employee_leave_date, department_name, department_id):
     # これが基準のクエリ
     query_update = f"UPDATE employee_table SET \
     employee_id = '{employee_id}', \
     employee_name = '{employee_name}', \
     employee_age = '{employee_age}', \
+    employee_image_id = '{employee_image_id}', \
     employee_postal_code = '{employee_postal_code}', \
     employee_address = '{employee_address}', \
     employee_start_date = '{employee_start_date}', \
@@ -110,10 +112,26 @@ def create_query_update_employee(id, employee_id, employee_name, employee_age, e
 
     return query_update
 
+# 社員情報編集時の画像変更のupdate文を書く
+def create_query_update_image(filename, employee_image_id):
+    sql_img = "./static/" + filename
+    query_update_image = f"UPDATE employee_image_table SET employee_image = '{sql_img}' WHERE employee_image_id = '{employee_image_id}' "
+    # query_update_image = f"UPDATE employee_image_table SET employee_image_id = '{employee_image_id}', employee_image = '{employee_image}' "
+    return query_update_image
+
+# 社員情報編集時の部署変更のupdate文を書く
+def create_query_update_department(department_name, department_id):
+    query_update_department = f"UPDATE department_table SET department_name = '{department_name}' WHERE department_id = '{department_id}' "
+    # query_update_department = f"UPDATE department_table SET department_id = '{department_id}', department_name = '{department_name}' "
+    return query_update_department
+
+
+
 def retrieve_edit_employee(cursor):
     employees = []
-    for (id, employee_id, employee_name, employee_age, employee_gender, employee_image_id, employee_postal_code, employee_prefecture, employee_address, department_id, employee_start_date, employee_leave_date, employee_update_date, employee_image) in cursor:
-        item = Employee(id, employee_id, employee_name, employee_age, employee_gender, employee_image_id, employee_postal_code, employee_prefecture, employee_address, department_id, employee_start_date, employee_leave_date, employee_update_date, employee_image)
+    for (id, employee_id, employee_name, employee_age, employee_gender, employee_image_id, employee_postal_code, employee_prefecture, employee_address, department_id, employee_start_date, employee_leave_date, employee_update_date, employee_image, department_name) in cursor:
+        item = EmpDeptImgAll(id, employee_id, employee_name, employee_age, employee_gender, employee_image_id, employee_postal_code, employee_prefecture, employee_address, department_id, employee_start_date, employee_leave_date, employee_update_date, employee_image, department_name)
+        # item = Employee(id, employee_id, employee_name, employee_age, employee_gender, employee_image_id, employee_postal_code, employee_prefecture, employee_address, department_id, employee_start_date, employee_leave_date, employee_update_date, employee_image)
         # item = { "id":id, "employee_id":employee_id, "employee_name":employee_name, "employee_age":employee_age, "employee_gender":employee_gender, "employee_image_id":employee_image_id, "employee_postal_code":employee_postal_code, "employee_prefecture":employee_prefecture, "employee_address":employee_address, "department_id":department_id, "employee_start_date":employee_start_date, "employee_leave_date":employee_leave_date, "employee_update_date":employee_update_date, "employee_image":employee_image}
         employees.append(item)
     return employees

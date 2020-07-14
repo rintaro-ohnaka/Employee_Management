@@ -48,12 +48,14 @@
 
             <p><label for="">写真：</label>
             <input type="file" name="employee_image" value="{{item.employee_image_id}}"></p>
+            <input type="hidden" name="employee_image_id" value="{{item.employee_image_id}}">
 
             <p><label for="">郵便番号：</label>
             <input type="text" name="employee_postal_code" value="{{item.employee_postal_code}}"></p>
 
             <p>都道府県：<select name="employee_prefecture" id="">
-                <option value="" selected>選択してください</option>
+                <option value="{{item.employee_prefecture}}" selected>{{item.employee_prefecture}}</option>
+                <!-- <option value="" selected>選択してください</option> -->
                 <option value="北海道">北海道</option>
                 <option value="青森県">青森県</option>
                 <option value="岩手県">岩手県</option>
@@ -108,7 +110,8 @@
 
 
             <p>所属：<select name="department_name" id="">
-                <option value="" selected>選択してください</option>
+                <option value="{{item.department_name}}&{{item.department_id}}" selected>{{ item.department_name }}</option>
+                <!-- <option value="" selected>選択してください</option> -->
                 {% for item in department %}
                 <option value="{{item.department_name}}&{{item.department_id}}">{{ item.department_name }}</option>
                 <!-- <input type="hidden" name="department_id" value="{{item.department_id}}"> -->
@@ -133,9 +136,9 @@
                 <button type="submit">設定する</button>
             </form></p> -->
 
-            <p><form method="post" action="/">
+            <!-- <p><form method="post" action="/">
                 <button type="submit">キャンセルする</button>
-            </form></p>
+            </form></p> -->
     <!-- </form> -->
 
 {% else %}
@@ -240,12 +243,16 @@
 
 
         <!-- <button type="submit">設定する</button> -->
-        <p><form method="post" action="/">
+        <!-- <p><form method="post" action="/">
             <button type="submit">キャンセルする</button>
-        </form></p>
+        </form></p> -->
         <!-- <button type="submit">キャンセルする</button> -->
     </form>
 {% endif %}
+
+<p><form method="post" action="/">
+    <button type="submit">キャンセルする</button>
+</form></p>
 
 <form method="post" action="/">
     <p><button type="submit">社員情報一覧に戻る</button></p>

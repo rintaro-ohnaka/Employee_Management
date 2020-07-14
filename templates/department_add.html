@@ -14,8 +14,11 @@
     <input type="text" name="change_department_name"></p>
     {% if department_name %}
         <input type="hidden" name="department_name" value="{{department_name}}">
+        <!-- <input type="hidden" name="department_name" value="{{department_name}}"> -->
     {% endif %}
     <p><button type="submit">設定する</button></p>
+</form>
+<form action="/department">
     <p><button type="submit">キャンセルする</button></p>
 </form>
 

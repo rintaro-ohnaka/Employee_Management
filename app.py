@@ -209,18 +209,12 @@ def show_edit_employee():
     # 部署一覧を取得している
     department = db.get_department_query()
     # 選択した社員の全てのステータスをここで取得
-    get_query_employee_information = f"SELECT id, employee_id, employee_name, employee_age, employee_gender, employee_table.employee_image_id, employee_postal_code, employee_prefecture, employee_address, department_id, employee_start_date, employee_leave_date, employee_update_date, employee_image FROM employee_table JOIN employee_image_table ON employee_table.employee_image_id = employee_image_table.employee_image_id WHERE employee_table.id = {id} "
+    get_query_employee_information = f"SELECT id, employee_id, employee_name, employee_age, employee_gender, employee_table.employee_image_id, employee_postal_code, employee_prefecture, employee_address, employee_table.department_id, employee_start_date, employee_leave_date, employee_update_date, employee_image, department_table.department_name FROM employee_table JOIN employee_image_table ON employee_table.employee_image_id = employee_image_table.employee_image_id JOIN department_table ON employee_table.department_id = department_table.department_id WHERE employee_table.id = {id} "
+    # get_query_employee_information = f"SELECT id, employee_id, employee_name, employee_age, employee_gender, employee_table.employee_image_id, employee_postal_code, employee_prefecture, employee_address, department_id, employee_start_date, employee_leave_date, employee_update_date, employee_image FROM employee_table JOIN employee_image_table ON employee_table.employee_image_id = employee_image_table.employee_image_id WHERE employee_table.id = {id} "
     # get_query_employee_information = f"SELECT * FROM employee_table WHERE id = {id} "
     cursor.execute(get_query_employee_information)
 
     employees = db.retrieve_edit_employee(cursor)
-    # employees = []
-    # for (id, employee_id, employee_name, employee_age, employee_gender, employee_image_id, employee_postal_code, employee_prefecture, employee_address, department_id, employee_start_date, employee_leave_date, employee_update_date, employee_image) in cursor:
-    #     item = { "id":id, "employee_id":employee_id, "employee_name":employee_name, "employee_age":employee_age, "employee_gender":employee_gender, "employee_image_id":employee_image_id, "employee_postal_code":employee_postal_code, "employee_prefecture":employee_prefecture, "employee_address":employee_address, "department_id":department_id, "employee_start_date":employee_start_date, "employee_leave_date":employee_leave_date, "employee_update_date":employee_update_date, "employee_image":employee_image}
-    #     employees.append(item)
-    # for (id, employee_id, employee_name, employee_age, employee_gender, employee_image_id, employee_postal_code, employee_prefecture, employee_address, department_id, employee_start_date, employee_leave_date, employee_update_date) in cursor:
-    #     item = { "id":id, "employee_id":employee_id, "employee_name":employee_name, "employee_age":employee_age, "employee_gender":employee_gender, "employee_image_id":employee_image_id, "employee_postal_code":employee_postal_code, "employee_prefecture":employee_prefecture, "employee_address":employee_address, "department_id":department_id, "employee_start_date":employee_start_date, "employee_leave_date":employee_leave_date, "employee_update_date":employee_update_date}
-    #     employees.append(item)
     
     
     params = {
@@ -237,10 +231,10 @@ def show_edit_employee():
 # 社員情報を編集する機能をまとめて関数になる
 @app.route("/edit_employee", methods=["GET", "POST"])
 def edit_employee():
-    id, employee_id, employee_name, employee_age, employee_gender, employee_image, employee_postal_code, employee_prefecture, employee_address, employee_start_date, employee_leave_date, department_name, department_id = request_edit_employee()
+    id, employee_id, employee_name, employee_age, employee_gender, employee_image, employee_image_id, employee_postal_code, employee_prefecture, employee_address, employee_start_date, employee_leave_date, department_name, department_id = request_edit_employee()
     # employee_image_id = create_employee_image_id()
     # filename = save_filename(employee_image)
-    check_edit_employee(id, employee_id, employee_name, employee_age, employee_gender, employee_image, employee_postal_code, employee_prefecture, employee_address, department_id, employee_start_date, employee_leave_date, department_name)
+    check_edit_employee(id, employee_id, employee_name, employee_age, employee_gender, employee_image, employee_image_id, employee_postal_code, employee_prefecture, employee_address, department_id, employee_start_date, employee_leave_date, department_name)
     return render_template("result.html")
 
 # 社員情報編集時のリクエストを受けとる関数
@@ -251,6 +245,7 @@ def request_edit_employee():
     employee_age = request.form.get("employee_age", "")
     employee_gender = request.form.get("employee_gender", "")
     employee_image = request.files.get("employee_image", "")
+    employee_image_id = request.form.get("employee_image_id", "")
     employee_postal_code = request.form.get("employee_postal_code", "")
     employee_prefecture = request.form.get("employee_prefecture", "")
     employee_address = request.form.get("employee_address", "")
@@ -266,7 +261,7 @@ def request_edit_employee():
     #     department_array = department_name_id.split("&")
     #     department_name = department_array[0]
     #     department_id = department_array[1]
-    return id, employee_id, employee_name, employee_age, employee_gender, employee_image, employee_postal_code, employee_prefecture, employee_address, employee_start_date, employee_leave_date, department_name, department_id
+    return id, employee_id, employee_name, employee_age, employee_gender, employee_image, employee_image_id, employee_postal_code, employee_prefecture, employee_address, employee_start_date, employee_leave_date, department_name, department_id
 
 # 部署が入力されているかのチェック関数
 def check_department(department_name_id):
@@ -292,25 +287,35 @@ def check_department(department_name_id):
 #     return
 
 # こっちで新しいの作ってみる
-def execute_edit_employee(id, employee_id, employee_name, employee_age, employee_gender, employee_image, employee_postal_code, employee_prefecture, employee_address, employee_start_date, employee_leave_date, department_name, department_id):
+def execute_edit_employee(id, employee_id, employee_name, employee_age, employee_gender, employee_image, employee_image_id, employee_postal_code, employee_prefecture, employee_address, employee_start_date, employee_leave_date, department_name, department_id):
     cursor, cnx = db.get_connection()
     # employee_image_id = create_employee_image_id()
     # query_update = db.create_query_update_employee(id, employee_id, employee_name, employee_age, employee_gender, employee_image, employee_postal_code, employee_prefecture, employee_address, employee_start_date, employee_leave_date, department_name, department_id)
-    query_update = get_query_edit_employee(id, employee_id, employee_name, employee_age, employee_gender, employee_image, employee_postal_code, employee_prefecture, employee_address, employee_start_date, employee_leave_date, department_name, department_id)
+    query_update = get_query_edit_employee(id, employee_id, employee_name, employee_age, employee_gender, employee_image, employee_image_id, employee_postal_code, employee_prefecture, employee_address, employee_start_date, employee_leave_date, department_name, department_id)
+    if employee_image.filename != "":
+        filename = save_filename(employee_image)
+        query_update_image = db.create_query_update_image(filename, employee_image_id)
+        cursor.execute(query_update_image)
+
+    # query_update_department = db.create_query_update_department(department_name, department_id)
     cursor.execute(query_update)
+
+    # cursor.execute(query_update_department)
     cnx.commit()
     return
 
-def get_query_edit_employee(id, employee_id, employee_name, employee_age, employee_gender, employee_image, employee_postal_code, employee_prefecture, employee_address, employee_start_date, employee_leave_date, department_name, department_id):
-    query_update = db.create_query_update_employee(id, employee_id, employee_name, employee_age, employee_gender, employee_image, employee_postal_code, employee_prefecture, employee_address, employee_start_date, employee_leave_date, department_name, department_id)
-    if employee_image.filename != "":
-        employee_image_id = create_employee_image_id()
-        query_update += f", employee_image_id = '{employee_image_id}'"
-        filename = save_filename(employee_image)
+def get_query_edit_employee(id, employee_id, employee_name, employee_age, employee_gender, employee_image, employee_image_id, employee_postal_code, employee_prefecture, employee_address, employee_start_date, employee_leave_date, department_name, department_id):
+    query_update = db.create_query_update_employee(id, employee_id, employee_name, employee_age, employee_gender, employee_image, employee_image_id, employee_postal_code, employee_prefecture, employee_address, employee_start_date, employee_leave_date, department_name, department_id)
+    # if employee_image.filename != "":
+    #     employee_image_id = create_employee_image_id()
+    #     query_update += f", employee_image_id = '{employee_image_id}'"
+    #     filename = save_filename(employee_image)
     if employee_gender != "":
         query_update += f", employee_gender = '{employee_gender}'"
     if employee_prefecture != "":
         query_update += f", employee_prefecture = '{employee_prefecture}'"
+    if department_id != "":
+        query_update += f", department_id = '{department_id}' "
 
     query_update += f" WHERE id = {id}"
     return query_update
@@ -334,7 +339,7 @@ def get_query_edit_employee(id, employee_id, employee_name, employee_age, employ
 #     return query_update_employee
 
 # 編集時のform入力に不備がないかのチェック関数
-def check_edit_employee(id, employee_id, employee_name, employee_age, employee_gender, employee_image, employee_postal_code, employee_prefecture, employee_address, department_id, employee_start_date, employee_leave_date, department_name):
+def check_edit_employee(id, employee_id, employee_name, employee_age, employee_gender, employee_image, employee_image_id, employee_postal_code, employee_prefecture, employee_address, department_id, employee_start_date, employee_leave_date, department_name):
     # とりあえず、formで値が送られているかチャックするロジックを書いてみよう
     if employee_id == "" or employee_name == "" or employee_age == "" or employee_postal_code == "" or employee_address == "" or employee_start_date == "" or department_name == "":
     # if employee_id == "" or employee_name == "" or employee_age == "" or employee_gender == "" or employee_image == "" or employee_postal_code == "" or employee_prefecture == "" or employee_address == "" or employee_start_date == "":
@@ -344,7 +349,7 @@ def check_edit_employee(id, employee_id, employee_name, employee_age, employee_g
     elif not employee_postal_code.isdecimal():
         flash("郵便番号は数字だけ入れてくれ", "")
     else:
-        execute_edit_employee(id, employee_id, employee_name, employee_age, employee_gender, employee_image, employee_postal_code, employee_prefecture, employee_address, employee_start_date, employee_leave_date, department_name, department_id)
+        execute_edit_employee(id, employee_id, employee_name, employee_age, employee_gender, employee_image, employee_image_id, employee_postal_code, employee_prefecture, employee_address, employee_start_date, employee_leave_date, department_name, department_id)
         flash("編集することに成功したよ！", "")
 
 
