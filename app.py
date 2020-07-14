@@ -108,15 +108,18 @@ def request_add_employee():
     department_name_id = request.form.get("department_name", "")
     employee_start_date = request.form.get("employee_start_date", "")
     employee_leave_date = request.form.get("employee_leave_date", "")
-    department_array = department_name_id.split("&")
-    department_name = department_array[0]
-    department_id = department_array[1]
+    department_name, department_id = check_department(department_name_id)
+    # department_array = department_name_id.split("&")
+    # department_name = department_array[0]
+    # department_id = department_array[1]
     return employee_id, employee_name, employee_age, employee_gender, employee_image, employee_postal_code, employee_prefecture, employee_address, department_name_id, employee_start_date, employee_leave_date, department_name, department_id
+
 
 # formの入力に不備がないかのチェック関数
 def check_add_employee(employee_id, employee_name, employee_age, employee_gender, employee_image, employee_postal_code, employee_prefecture, employee_address, department_id, employee_start_date, employee_leave_date, department_name):
     # とりあえず、formで値が送られているかチャックするロジックを書いてみよう
-    if employee_id == "" or employee_name == "" or employee_age == "" or employee_gender == "" or employee_image == "" or employee_postal_code == "" or employee_prefecture == "" or employee_address == "" or employee_start_date == "":
+    if employee_id == "" or employee_name == "" or employee_age == "" or employee_postal_code == "" or employee_address == "" or employee_start_date == "" or department_name == "":
+    # if employee_id == "" or employee_name == "" or employee_age == "" or employee_gender == "" or employee_image == "" or employee_postal_code == "" or employee_prefecture == "" or employee_address == "" or employee_start_date == "" or department_name == "":
         flash("入力される情報に不備があったため、登録に失敗しました")
     elif not employee_age.isdecimal():
         flash("年齢は数字で入れてくれ", "")
