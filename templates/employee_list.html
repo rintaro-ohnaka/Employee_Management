@@ -33,8 +33,10 @@
 <table>
     <tr>
         <th>社員ID</th>
+        <!-- <th>写真</th> -->
         <th>名前</th>
         <th>年齢</th>
+        <th>性別</th>
         <th>編集</th>
         <th>削除</th>
     </tr>
@@ -42,8 +44,11 @@
     {% for item in employees %}
     <tr>
         <td>{{ item.employee_id }}</td>
+        <!-- <td><img src="{{item.employee_image}}" alt=""></td> -->
+        <!-- <td><img src="{{ item.employee_image }}"></td> -->
         <td>{{ item.employee_name }}</td>
         <td>{{ item.employee_age }}</td>
+        <td>{{ item.employee_gender }}</td>
         <td>
             <form method="post" action="/show_edit_employee">
                 <input type="hidden" name="id" value="{{item.id}}">

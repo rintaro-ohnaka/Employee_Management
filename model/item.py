@@ -21,7 +21,16 @@ class Department(object):
         self.department_id = department_id
         self.department_name = department_name
 
+class Image(object):
+    def __init__(self, employee_image_id="", employee_image=""):
+        self.employee_image_id = employee_image_id
+        self.employee_image = employee_image
+
 # 多重継承というのをやってみる
 class EmpDept(Employee, Department):
+    pass
+
+# 画像も混ぜたクラスを作ってみる
+class EmpDeptImg(EmpDept, Image):
     pass
 

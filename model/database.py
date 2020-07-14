@@ -1,6 +1,6 @@
 import mysql.connector
 from model.const import DB
-from model.item import Employee, Department, EmpDept
+from model.item import Employee, Department, EmpDept, EmpDeptImg
 # from model.item import Department
 # from werkzeug.utils import secure_filename
 # import os
@@ -20,9 +20,11 @@ def get_connection():
 # 社員データを取得し、配列に代入する
 def retrieve_employees(cursor):
     employees = []
-    for (id, employee_id, employee_name, employee_age, employee_gender, employee_image_id, employee_postal_code, employee_prefecture, employee_address, department_id, employee_start_date, employee_leave_date, employee_update_date) in cursor:
+    for (id, employee_id, employee_name, employee_age, employee_gender, employee_image , department_name) in cursor:
+    # for (id, employee_id, employee_name, employee_age, employee_gender, employee_image_id, employee_postal_code, employee_prefecture, employee_address, department_id, employee_start_date, employee_leave_date, employee_update_date) in cursor:
         # ここでクラスを使っている
-        item = Employee(id, employee_id, employee_name, employee_age, employee_gender, employee_image_id, employee_postal_code, employee_prefecture, employee_address, department_id, employee_start_date, employee_leave_date, employee_update_date)
+        item = EmpDeptImg(id, employee_id, employee_name, employee_age, employee_gender, employee_image, department_name)
+        # item = Employee(id, employee_id, employee_name, employee_age, employee_gender, employee_image_id, employee_postal_code, employee_prefecture, employee_address, department_id, employee_start_date, employee_leave_date, employee_update_date)
         # item = { "id":id, "employee_id":employee_id, "employee_name":employee_name, "employee_age":employee_age, "employee_gender":employee_gender, "employee_image_id":employee_image_id, "employee_postal_code":employee_postal_code, "employee_prefecture":employee_prefecture, "employee_address":employee_address, "department_id":department_id, "employee_start_date":employee_start_date, "employee_leave_date":employee_leave_date, "employee_update_date":employee_update_date}
         employees.append(item)
     return employees
@@ -30,7 +32,8 @@ def retrieve_employees(cursor):
 # 社員情報をSQLで取得
 def get_employee_query():
     cursor, cnx = get_connection()
-    employee_list = "SELECT * FROM employee_table"
+    employee_list = "SELECT id, employee_id, employee_name, employee_age, employee_gender, employee_image , department_name FROM employee_table JOIN employee_image_table ON employee_table.employee_image_id = employee_image_table.employee_image_id JOIN department_table ON employee_table.department_id = department_table.department_id"
+    # employee_list = "SELECT * FROM employee_table"
     # employee_list = "SELECT id, employee_id, employee_name FROM employee_table"
     cursor.execute(employee_list)
     employees = retrieve_employees(cursor)
