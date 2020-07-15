@@ -182,10 +182,10 @@ def get_query_search_employee(get_query_search_employee_table, department_name, 
     return get_query_search_employee_table
 
 # 検索した従業員データを取得し、配列に代入する
-def retrieve_serarch_employees(cursor):
+def retrieve_search_employees(cursor):
     search_employees = []
     for (id, employee_id, employee_name, department_name) in cursor:
-        item = EmpDept(id, employee_id, employee_name, department_name)
+        item = EmpDeptImgAll(id, employee_id, employee_name, department_name)
         # item = {"id":id, "employee_id":employee_id, "employee_name":employee_name, "department_name":department_name}
         search_employees.append(item)
     return search_employees
@@ -200,6 +200,7 @@ def csv_retrieve_employees(cursor):
     return csv_employees
 
 # 全社員情報をSQLで取得
+# 名前悩むな
 def get_csv_employee_query():
     cursor, cnx = get_connection()
     employee_list = "SELECT id, employee_id, employee_name, employee_age, employee_gender, employee_image_id, employee_postal_code, employee_prefecture, employee_address, employee_table.department_id, department_name, employee_start_date, employee_leave_date, employee_update_date FROM employee_table JOIN department_table ON employee_table.department_id = department_table.department_id"

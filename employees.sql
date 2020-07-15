@@ -37,57 +37,57 @@ CREATE TABLE department_table(
 )
 
 
--- 社員情報データを入れてみる
-INSERT INTO employee_table(
-    employee_name,
-    employee_age,
-    employee_gender,
-    employee_postal_code,
-    employee_prefecture,
-    employee_address,
-    employee_start_date,
-    employee_leave_date
-) VALUES (
-    '{employee_name}',
-    '{employee_age}',
-    '{employee_gender}',
-    '{employee_postal_code}',
-    '{employee_prefecture}',
-    '{employee_address}',
-    '{employee_start_date}',
-    '{employee_leave_date}'
-)
+-- -- 社員情報データを入れてみる
+-- INSERT INTO employee_table(
+--     employee_name,
+--     employee_age,
+--     employee_gender,
+--     employee_postal_code,
+--     employee_prefecture,
+--     employee_address,
+--     employee_start_date,
+--     employee_leave_date
+-- ) VALUES (
+--     '{employee_name}',
+--     '{employee_age}',
+--     '{employee_gender}',
+--     '{employee_postal_code}',
+--     '{employee_prefecture}',
+--     '{employee_address}',
+--     '{employee_start_date}',
+--     '{employee_leave_date}'
+-- )
 
--- 写真データを入れてみる
-INSERT INTO employee_image_table(
-    employee_image,
-    employee_image_update_date
-) VALUES (
-    '{employee_image}',
-    'LOCALTIME()'
-)
+-- -- 写真データを入れてみる
+-- INSERT INTO employee_image_table(
+--     employee_image,
+--     employee_image_update_date
+-- ) VALUES (
+--     '{employee_image}',
+--     'LOCALTIME()'
+-- )
 
--- 部署データを入れてみる
-INSERT INTO department_table(
-    department_name,
-    department_create_date,
-    department_update_date
-) VALUES (
-    '{department_name}',
-    'LOCALTIME()',
-    'LOCALTIME()'
-)
+-- -- 部署データを入れてみる
+-- INSERT INTO department_table(
+--     department_name,
+--     department_create_date,
+--     department_update_date
+-- ) VALUES (
+--     '{department_name}',
+--     'LOCALTIME()',
+--     'LOCALTIME()'
+-- )
 
--- 社員情報一覧を取得してみる
-SELECT employee_id, employee_name
-FROM employee_table
-JOIN employee_image_table
-ON employee_table.employee_image_id = employee_image_table.employee_image_id
+-- -- 社員情報一覧を取得してみる
+-- SELECT employee_id, employee_name
+-- FROM employee_table
+-- JOIN employee_image_table
+-- ON employee_table.employee_image_id = employee_image_table.employee_image_id
 
--- 部署名変更をの文を書いてみる
-UPDATE department_table 
-SET department_id = "", department_name = "" 
-WHERE department_name = ""
+-- -- 部署名変更をの文を書いてみる
+-- UPDATE department_table 
+-- SET department_id = "", department_name = "" 
+-- WHERE department_name = ""
 
 
-SELECT * FROM employee_table INTO OUTFILE './tmp/employee_table.csv' FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"';
+-- SELECT * FROM employee_table INTO OUTFILE './tmp/employee_table.csv' FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"';

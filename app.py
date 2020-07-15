@@ -499,7 +499,7 @@ def employee_search():
     get_query_search_employee_table = db.get_query_search_employee(get_query_search_employee_table, department_name, search_employee_id, search_employee_name)
 
     cursor.execute(get_query_search_employee_table)
-    search_employees = db.retrieve_serarch_employees(cursor)
+    search_employees = db.retrieve_search_employees(cursor)
     if len(search_employees) == 0:
         flash("登録されている社員がいません", "")
     else:
